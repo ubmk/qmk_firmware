@@ -4,6 +4,7 @@
 #include "nrf_log_default_backends.h"
 #include "nrf_pwr_mgmt.h"
 #include "nrf_gpio.h"
+#include "nrf_delay.h"
 #include "nrfx_power.h"
 #include "peer_manager.h"
 
@@ -111,14 +112,40 @@ void delete_bond_id(uint8_t id) {
  * @note This function will not return.
  */
 void sleep_mode_enter(void) {
-  extern const uint32_t row_pins[THIS_DEVICE_ROWS];
-  extern const uint32_t col_pins[THIS_DEVICE_COLS];
-  int i;
-
   if (nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_CONNECTED ||
       nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_READY) {
     return;
   }
+  extern const uint32_t row_pins[THIS_DEVICE_ROWS];
+  extern const uint32_t col_pins[THIS_DEVICE_COLS];
+
+#ifdef UBMK
+
+  nrf_delay_ms(1000);
+#ifdef WEEKUP_KEYS
+  const uint32_t weekUpKey[2] = WEEKUP_KEYS;
+  nrf_gpio_cfg_output(row_pins[weekUpKey[0]]);
+  nrfx_coredep_delay_us(1);
+  nrf_gpio_pin_clear(row_pins[weekUpKey[0]]);
+  nrfx_coredep_delay_us(1);
+  nrf_gpio_cfg_sense_input(col_pins[weekUpKey[1]], NRF_GPIO_PIN_PULLUP, NRF_GPIO_PIN_SENSE_LOW);
+  nrfx_coredep_delay_us(1);
+#else
+  int i;
+  for (i=0; i<THIS_DEVICE_ROWS; i++) {
+    nrf_gpio_cfg_output(row_pins[i]);
+    nrfx_coredep_delay_us(1);
+    nrf_gpio_pin_clear(row_pins[i]);
+    nrfx_coredep_delay_us(1);
+  }
+  for (i=0; i<THIS_DEVICE_COLS; i++) {
+    nrfx_coredep_delay_us(1);
+    nrf_gpio_cfg_sense_input(col_pins[i], NRF_GPIO_PIN_PULLUP, NRF_GPIO_PIN_SENSE_LOW);
+  }
+#endif
+
+#else
+  int i;
 #if DIODE_DIRECTION == ROW2COL
   for (i=0; i<THIS_DEVICE_COLS; i++) {
     nrf_gpio_pin_clear(col_pins[i]);
@@ -133,6 +160,8 @@ void sleep_mode_enter(void) {
   for (i=0; i<THIS_DEVICE_COLS; i++) {
     nrf_gpio_cfg_sense_input(col_pins[i], NRF_GPIO_PIN_PULLUP, NRF_GPIO_PIN_SENSE_LOW);
   }
+#endif
+
 #endif
 
   sd_power_system_off();

@@ -28,7 +28,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "rgblight.h"
 #endif
 
-const uint8_t MAINTASK_INTERVAL=17;
+#ifndef MATRIX_SCAN_MS
+#define MATRIX_SCAN_MS 17
+#endif
+
+const uint8_t MAINTASK_INTERVAL=MATRIX_SCAN_MS;
 
 void sendchar_pf(void *p, char c){
   UNUSED_VARIABLE(p);

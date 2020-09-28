@@ -396,6 +396,7 @@ static void battery_level_update(void) {
   uint8_t battery_level;
 
   adc_start();
+
 #ifdef USE_BATTERY_PIN
   m_vbat_history[m_vbat_history_index] = get_vcc();
   m_vbat_history_index++;
@@ -427,7 +428,18 @@ static void battery_level_update(void) {
   battery_level = diff * 100 / (V_MAX-V_MIN);
   NRF_LOG_DEBUG("         Avg: %04d mV, %d%%", vbat, battery_level);
 #else
+#ifdef BATTERY_LIPO
+  uint16_t cVcc = get_vcc();
+  if (cVcc < 2800) {
+    battery_level = 1.00F;
+  } else if (cVcc > 3250) {
+    battery_level = 100.00F;
+  } else {
+    battery_level = ((cVcc - 2900) * 100 / 1200);
+  }
+#else
   battery_level = get_vcc() / 30;
+#endif
 #endif
 
   err_code = ble_bas_battery_level_update(&m_bas, battery_level,
@@ -1338,6 +1350,10 @@ void restart_advertising_wo_whitelist() {
   if (err_code != NRF_ERROR_INVALID_STATE) {
     APP_ERROR_CHECK(err_code);
   }
+}
+
+pm_peer_id_t get_current_peer_id(void) {
+  return m_peer_id;
 }
 
 void restart_advertising_id(uint8_t id) {
