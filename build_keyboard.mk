@@ -152,7 +152,7 @@ ifdef MCU_FAMILY
     ifeq ($(MCU_FAMILY),NRF52)
         $(info "PLATFORM NRF5")
         PLATFORM=NRF_SDK
-        FIRMWARE_FORMAT?=hex
+        FIRMWARE_FORMAT=hex
     endif
 else
     PLATFORM=AVR

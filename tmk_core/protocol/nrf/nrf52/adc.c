@@ -19,29 +19,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "adc.h"
 #include "nrf_assert.h"
 #include "app_error.h"
+#include "nrf.h"
+#include "nrf_gpio.h"
+#include <inttypes.h>
 
 //#define NRF_LOG_MODULE_NAME "ADC"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
+
+#ifdef UBMK
+#include "ubmk.h"
+#else // Not UBMK
 
 #ifdef USE_BATTERY_PIN
 #define APP_VCC_PIN USE_BATTERY_PIN
 #else
 #define APP_VCC_PIN NRF_SAADC_INPUT_VDD
 #endif
-
 static nrf_saadc_value_t       adc_buffer[1]; /**< ADC buffer. */
 static void adc_event_handler(nrf_drv_saadc_evt_t const *p_event) {}
 
+#endif
+
 void adc_init() {
+#ifdef UBMK
+  #ifdef VDIV_PIN_OTHER
+  UBMK_API->gpio.mode(VDIV_PIN_OTHER, INPUT);
+  #endif
+  #ifdef VDIV_PIN
+  UBMK_API->gpio.mode(VDIV_PIN, INPUT);
+  #endif
+#else // NOT UBMK
   nrf_drv_saadc_config_t adccfg = NRF_DRV_SAADC_DEFAULT_CONFIG;
   adccfg.resolution = NRF_SAADC_RESOLUTION_8BIT;
   nrf_drv_saadc_init(&adccfg, adc_event_handler);
   nrf_saadc_channel_config_t pincfg = NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_SE(APP_VCC_PIN);
   nrf_drv_saadc_channel_init(0, &pincfg);
+#endif
 }
 
 void adc_start() {
+#ifdef UBMK
+#else // NOT UBMK
   ret_code_t res = nrf_drv_saadc_sample_convert(0, adc_buffer); // blocking function
   if (res != NRF_SUCCESS) {
     adc_buffer[0] = 0;
@@ -51,9 +70,13 @@ void adc_start() {
 #else
     NRF_LOG_DEBUG("Current vcc: %d mV", get_vcc());
 #endif
+#endif
 }
 
 uint16_t get_vcc() {
+#ifdef UBMK
+  return UBMK_API->gpio.analogReadMv(VDIV_PIN);
+#else // NOT UBMK
   int16_t v = adc_buffer[0] < 0 ? 0 : adc_buffer[0];
 #ifdef USE_BATTERY_PIN
 # ifndef BATTERY_VMAX
@@ -71,5 +94,6 @@ uint16_t get_vcc() {
   return ((uint32_t) v * 6 * 600 / 255) * V_MAX / V_BAT;
 #else
   return ((uint32_t) v * 6 * 600 / 255);
+#endif
 #endif
 }

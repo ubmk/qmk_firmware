@@ -4,6 +4,7 @@
 #include "nrf_log_default_backends.h"
 #include "nrf_pwr_mgmt.h"
 #include "nrf_gpio.h"
+#include "nrf_delay.h"
 #include "nrfx_power.h"
 #include "peer_manager.h"
 
@@ -12,6 +13,10 @@
 
 #ifndef THIS_DEVICE_ROWS
 #include "pin_assign.h"
+#endif
+
+#ifdef UBMK
+#include "ubmk.h"
 #endif
 
 uint8_t keyboard_idle __attribute__((aligned(2))) = 0;
@@ -111,14 +116,33 @@ void delete_bond_id(uint8_t id) {
  * @note This function will not return.
  */
 void sleep_mode_enter(void) {
-  extern const uint32_t row_pins[THIS_DEVICE_ROWS];
-  extern const uint32_t col_pins[THIS_DEVICE_COLS];
-  int i;
-
   if (nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_CONNECTED ||
       nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_READY) {
     return;
   }
+  extern const uint32_t row_pins[THIS_DEVICE_ROWS];
+  extern const uint32_t col_pins[THIS_DEVICE_COLS];
+
+#ifdef UBMK
+  UBMK_API->util.delay(1000);
+#ifdef WEEKUP_KEYS
+  const uint32_t weekUpKey[2] = WEEKUP_KEYS;
+  UBMK_API->gpio.mode(row_pins[weekUpKey[0]], OUTPUT);
+  UBMK_API->gpio.clear(row_pins[weekUpKey[0]]);
+  UBMK_API->gpio.mode(col_pins[weekUpKey[1]], INPUT_PULLUP_SENSE);
+#else
+  int i;
+  for (i=0; i<THIS_DEVICE_ROWS; i++) {
+    UBMK_API->gpio.mode(row_pins[i], OUTPUT);
+    UBMK_API->gpio.clear(row_pins[i]);
+  }
+  for (i=0; i<THIS_DEVICE_COLS; i++) {
+    UBMK_API->gpio.mode(col_pins[i], INPUT_PULLUP_SENSE);
+  }
+#endif
+
+#else // NOT UBMK
+  int i;
 #if DIODE_DIRECTION == ROW2COL
   for (i=0; i<THIS_DEVICE_COLS; i++) {
     nrf_gpio_pin_clear(col_pins[i]);
@@ -133,6 +157,8 @@ void sleep_mode_enter(void) {
   for (i=0; i<THIS_DEVICE_COLS; i++) {
     nrf_gpio_cfg_sense_input(col_pins[i], NRF_GPIO_PIN_PULLUP, NRF_GPIO_PIN_SENSE_LOW);
   }
+#endif
+
 #endif
 
   sd_power_system_off();
