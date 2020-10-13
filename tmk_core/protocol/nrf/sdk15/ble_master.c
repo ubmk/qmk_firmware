@@ -414,30 +414,34 @@ uint8_t get_battery_level(void) {
     sum += m_vbat_history[i];
   }
   int16_t vbat = sum / m_vbat_history_length;
-#ifdef UBMK
+# if defined(UBMK) && defined(VDIV_PIN)
   battery_level = UBMK_API->util.mvToPercent((float)vbat);
-#else // NOT UBMK
-# ifndef BATTERY_VMAX
-#   define V_MAX 4200
 # else
-#   define V_MAX BATTERY_VMAX
+
+#   ifndef BATTERY_VMAX
+#     define V_MAX 4200
+#   else
+#     define V_MAX BATTERY_VMAX
+#   endif
+#   ifndef BATTERY_VMIN
+#     define V_MIN 2900
+#   else
+#     define V_MIN BATTERY_VMIN
+#   endif
+    int16_t diff = vbat - V_MIN;
+    if (diff < 0) {
+      diff = 0;
+    } else if (diff > (V_MAX-V_MIN)) {
+      diff = V_MAX-V_MIN;
+    }
+    battery_level = diff * 100 / (V_MAX-V_MIN);
+    NRF_LOG_DEBUG("         Avg: %04d mV, %d%%", vbat, battery_level);
+
 # endif
-# ifndef BATTERY_VMIN
-#   define V_MIN 2900
-# else
-#   define V_MIN BATTERY_VMIN
-# endif
-  int16_t diff = vbat - V_MIN;
-  if (diff < 0) {
-    diff = 0;
-  } else if (diff > (V_MAX-V_MIN)) {
-    diff = V_MAX-V_MIN;
-  }
-  battery_level = diff * 100 / (V_MAX-V_MIN);
-  NRF_LOG_DEBUG("         Avg: %04d mV, %d%%", vbat, battery_level);
-#endif
+
 #else // NOT USE_BATTERY_PIN
-#ifdef BATTERY_LIPO
+
+# ifdef UBMK
   uint16_t cVcc = get_vcc();
   if (cVcc < 2800) {
     battery_level = 1.00F;
@@ -446,10 +450,11 @@ uint8_t get_battery_level(void) {
   } else {
     battery_level = ((cVcc - 2900) * 100 / 1200);
   }
-#else
+# else
   battery_level = get_vcc() / 30;
+# endif
 #endif
-#endif
+
   low_battery = (battery_level <= 10);
   return battery_level;
 }

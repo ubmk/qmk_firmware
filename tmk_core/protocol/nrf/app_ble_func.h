@@ -42,6 +42,7 @@ void peer_connected_event(void);
 
 void start_dfu();
 void sleep_mode_enter();
+void before_sleep_mode_enter(void);
 
 uint16_t get_vcc();
 uint8_t get_battery_level(void);

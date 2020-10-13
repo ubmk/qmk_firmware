@@ -16,7 +16,7 @@
 
 /* key matrix size */
 #define MATRIX_ROWS 9
-#define MATRIX_COLS 8
+#define MATRIX_COLS 7
 
 #define THIS_DEVICE_ROWS MATRIX_ROWS
 #define THIS_DEVICE_COLS MATRIX_COLS

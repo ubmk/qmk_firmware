@@ -38,9 +38,9 @@
 
 #ifdef UBMK60_V1_0
 
-#define NRF_SDH_CLOCK_LF_SRC 0
-#define NRF_SDH_CLOCK_LF_RC_CTIV 16
-#define NRF_SDH_CLOCK_LF_RC_TEMP_CTIV 2
+    #define NRF_SDH_CLOCK_LF_SRC 0
+    #define NRF_SDH_CLOCK_LF_RC_CTIV 16
+    #define NRF_SDH_CLOCK_LF_RC_TEMP_CTIV 2
 
 #else
 #error "NO BOARD!"

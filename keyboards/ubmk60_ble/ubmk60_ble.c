@@ -71,7 +71,9 @@ void ubmk_init() {
 
 void ubmk_update() {
     sleepProcess();
+    #ifdef VDIV_PIN
     notifyLowBattery();
+    #endif
 }
 
 bool ubmk_process(uint16_t keycode, keyrecord_t *record) {
@@ -155,5 +157,23 @@ void peer_connected_event(void) {
     } else {
         UBMK_API->gpio.clear(LED_PIN3);
     }
+    #endif
+}
+
+void before_sleep_mode_enter(void) {
+    #ifdef LED_CAP
+    UBMK_API->gpio.clear(LED_CAP);
+    #endif
+    #ifdef LED_PIN0
+    UBMK_API->gpio.clear(LED_PIN0);
+    #endif
+    #ifdef LED_PIN1
+    UBMK_API->gpio.clear(LED_PIN1);
+    #endif
+    #ifdef LED_PIN2
+    UBMK_API->gpio.clear(LED_PIN2);
+    #endif
+    #ifdef LED_PIN3
+    UBMK_API->gpio.clear(LED_PIN3);
     #endif
 }
