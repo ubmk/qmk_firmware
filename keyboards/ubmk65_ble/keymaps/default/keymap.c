@@ -16,14 +16,10 @@ enum custom_keycodes
   ADV_ID0,              /* Start advertising to PeerID 0        */
   ADV_ID1,              /* Start advertising to PeerID 1        */
   ADV_ID2,              /* Start advertising to PeerID 2        */
-  ADV_ID3,              /* Start advertising to PeerID 3        */
-  ADV_ID4,              /* Start advertising to PeerID 4        */
   BATT_LV,              /* Display battery level in milli volts */
   DEL_ID0,              /* Delete bonding of PeerID 0           */
   DEL_ID1,              /* Delete bonding of PeerID 1           */
   DEL_ID2,              /* Delete bonding of PeerID 2           */
-  DEL_ID3,              /* Delete bonding of PeerID 3           */
-  DEL_ID4,              /* Delete bonding of PeerID 4           */
   ENT_DFU,              /* Start bootloader                     */
   ENT_SLP               /* Deep sleep mode                      */
 };
@@ -127,8 +123,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         result = false;
         break;
       case USB_SEL:
-        set_ble_enabled(true);
-        set_usb_enabled(false);
+        set_ble_enabled(false);
+        set_usb_enabled(true);
         break;
       case BLE_EN:
         set_ble_enabled(true);
@@ -162,14 +158,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         restart_advertising_id(2);
         result = false;
         break;
-      case ADV_ID3:
-        restart_advertising_id(3);
-        result = false;
-        break;
-      case ADV_ID4:
-        restart_advertising_id(4);
-        result = false;
-        break;
       case DEL_ID0:
         delete_bond_id(0);
         result = false;
@@ -181,15 +169,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       case DEL_ID2:
         delete_bond_id(2);
         result = false;
-        break;
-      case DEL_ID3:
-        delete_bond_id(3);
-        result = false;
+        
         break;
       case BATT_LV:
-        sprintf(str, "%4dmV", get_vcc());
+        sprintf(str, "%4dmV => %2d%% \n", (uint16_t)get_vcc(), (uint16_t)get_battery_level());
         send_string(str);
-
         result = false;
         break;
       case ENT_DFU:

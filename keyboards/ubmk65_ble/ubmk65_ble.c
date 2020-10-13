@@ -25,24 +25,61 @@ uint32_t __lastTimePressed = 0;
 bool __sleeped = false;
 
 void ubmk_init() {
+    #ifdef LED_PIN0
     UBMK_API->gpio.mode(LED_PIN0, OUTPUT);
+    #endif
+    #ifdef LED_PIN1
     UBMK_API->gpio.mode(LED_PIN1, OUTPUT);
+    #endif
+    #ifdef LED_PIN2
     UBMK_API->gpio.mode(LED_PIN2, OUTPUT);
+    #endif
+    #ifdef LED_PIN3
     UBMK_API->gpio.mode(LED_PIN3, OUTPUT);
+    #endif
 
+    #ifdef LED_PIN0
     UBMK_API->gpio.set(LED_PIN0);
     UBMK_API->util.delay(50);
+    #endif
+    #ifdef LED_PIN1
     UBMK_API->gpio.set(LED_PIN1);
     UBMK_API->util.delay(50);
+    #endif
+    #ifdef LED_PIN2
     UBMK_API->gpio.set(LED_PIN2);
     UBMK_API->util.delay(50);
+    #endif
+    #ifdef LED_PIN3
     UBMK_API->gpio.set(LED_PIN3);
     UBMK_API->util.delay(50);
+    #endif
 
+    #ifdef LED_PIN0
     UBMK_API->gpio.clear(LED_PIN0);
+    #endif
+    #ifdef LED_PIN0
     UBMK_API->gpio.clear(LED_PIN1);
+    #endif
+    #ifdef LED_PIN0
     UBMK_API->gpio.clear(LED_PIN2);
+    #endif
+    #ifdef LED_PIN0
     UBMK_API->gpio.clear(LED_PIN3);
+    #endif
+}
+
+void ubmk_update() {
+    sleepProcess();
+    notifyLowBattery();
+}
+
+bool ubmk_process(uint16_t keycode, keyrecord_t *record) {
+    if (record->event.pressed) {
+        __lastTimePressed = timer_read32();
+        __sleeped = false;
+    }
+    return true;
 }
 
 void sleepProcess() {
@@ -58,32 +95,17 @@ void sleepProcess() {
 }
 
 void notifyLowBattery() {
-    if (get_vcc() < 3000) {
-        int t1 = ((int)(timer_read32() / 100));
-        int onT = (int)(t1 / 10) % 60;
-        if (onT % 10 == 0) {
-            if (t1 % 4 == 0) {
-                UBMK_API->gpio.set(LED_PIN0);
-            } else {
-                UBMK_API->gpio.clear(LED_PIN0);
-            }
-        } else {
+    #ifdef LED_PIN0
+    if (is_low_battery()) {
+        if (UBMK_API->gpio.read(LED_PIN0) == LOW) {
+            UBMK_API->gpio.set(LED_PIN0);
+        }
+    } else {
+        if (UBMK_API->gpio.read(LED_PIN0) == HIGH) {
             UBMK_API->gpio.clear(LED_PIN0);
         }
     }
-}
-
-void ubmk_update() {
-    sleepProcess();
-    notifyLowBattery();
-}
-
-bool ubmk_process(uint16_t keycode, keyrecord_t *record) {
-    if (record->event.pressed) {
-        __lastTimePressed = timer_read32();
-        __sleeped = false;
-    }
-    return true;
+    #endif
 }
 
 void matrix_init_kb() {
@@ -101,4 +123,37 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
         return false;
     }
     return process_record_user(keycode, record);
+}
+
+void led_set_kb(uint8_t usb_led) {
+    led_set_user(usb_led);
+    #ifdef LED_CAP
+    UBMK_API->gpio.write(LED_CAP, (usb_led & (1 << USB_LED_CAPS_LOCK)) ? HIGH : LOW);
+    #endif
+}
+
+void peer_connected_event(void) {
+    uint8_t current_peer_id = get_current_peer_id();
+
+    #ifdef LED_PIN1
+    if (current_peer_id == 0) {
+        UBMK_API->gpio.set(LED_PIN1);
+    } else {
+        UBMK_API->gpio.clear(LED_PIN1);
+    }
+    #endif
+    #ifdef LED_PIN2
+    if (current_peer_id == 1) {
+        UBMK_API->gpio.set(LED_PIN2);
+    } else {
+        UBMK_API->gpio.clear(LED_PIN2);
+    }
+    #endif
+    #ifdef LED_PIN3
+    if (current_peer_id == 2) {
+        UBMK_API->gpio.set(LED_PIN3);
+    } else {
+        UBMK_API->gpio.clear(LED_PIN3);
+    }
+    #endif
 }

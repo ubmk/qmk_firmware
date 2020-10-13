@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 // Tên bàn phím
-#define KEYBOARD_NAME       ubmk65
+#define KEYBOARD_NAME Ubmk60
 
 // Thời gian phím tự đi vào trạng thái ngủ sau một khoảng thời gian không thao tác, đặt = 0 nếu không cần sleep
 #define SLEEP_DELAY         600  // (giây)

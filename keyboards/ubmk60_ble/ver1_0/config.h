@@ -5,6 +5,8 @@
 #define UBMK60_V1_0
 #endif
 
+#define DEVICE_VER      0x0001
+
 #include "custom_board.h"
 
 #define MATRIX_ROW_PINS { PIN7, PIN8, PIN9, PIN10, PIN11, PIN12, PIN13, PIN14, PIN15 }

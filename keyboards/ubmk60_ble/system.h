@@ -4,16 +4,15 @@
 /* USB Device descriptor parameter */
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0x0010
-#define DEVICE_VER      0x0001
 /* in python2: list(u"whatever".encode('utf-16-le')) */
 /*   at most 32 characters or the ugly hack in usb_main.c borks */
 #define MANUFACTURER uybv
 #ifdef KEYBOARD_NAME
 #define PRODUCT KEYBOARD_NAME
 #else
-#define PRODUCT ubmk60
+#define PRODUCT Ubmk60
 #endif
-#define DESCRIPTION UBMK60 Keyboard
+#define DESCRIPTION Ubmk60 Keyboard
 
 /* key matrix size */
 #define MATRIX_ROWS 9
@@ -44,6 +43,10 @@
 #define SLEEP_DELAY          300 // 300(s)
 #endif
 // #define WEEKUP_ANY_KEY
+
+#ifndef MAX_DEVICE
+#define MAX_DEVICE           3
+#endif
 
 #ifndef HID_BLE_SPEED
 #define HID_BLE_SPEED        3

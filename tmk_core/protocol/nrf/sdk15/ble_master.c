@@ -94,7 +94,7 @@
 #define APP_BLE_CONN_CFG_TAG                1                                          /**< A tag identifying the SoftDevice BLE configuration. */
 
 #define BATTERY_LEVEL_MEAS_INTERVAL         APP_TIMER_TICKS(2000)                      /**< Battery level measurement interval (ticks). */
-#define MAX_VBAT_HISTORY_SIZE               30
+#define MAX_VBAT_HISTORY_SIZE               10
 
 #define PNP_ID_VENDOR_ID_SOURCE             0x02                                       /**< Vendor ID Source. */
 #define PNP_ID_VENDOR_ID                    0x1915                                     /**< Vendor ID. */
@@ -186,6 +186,11 @@ static int16_t m_vbat_history[MAX_VBAT_HISTORY_SIZE]; /**< List of battery volta
 static uint8_t m_vbat_history_length = 0;
 static uint8_t m_vbat_history_index = 0;
 #endif
+
+static bool low_battery = false;
+
+__attribute__ ((weak))
+void peer_connected_event(void) {}
 
 static ble_uuid_t m_adv_uuids[] = { { BLE_UUID_HUMAN_INTERFACE_DEVICE_SERVICE,
     BLE_UUID_TYPE_BLE } };
@@ -372,6 +377,8 @@ static void pm_evt_handler(pm_evt_t const * p_evt) {
   default:
     break;
   }
+
+  peer_connected_event();
 }
 
 /**@brief Function for handling Service errors.
@@ -393,14 +400,8 @@ static void ble_advertising_error_handler(uint32_t nrf_error) {
   APP_ERROR_HANDLER(nrf_error);
 }
 
-/**@brief Function for performing a battery measurement, and update the Battery Level characteristic in the Battery Service.
- */
-static void battery_level_update(void) {
-  ret_code_t err_code;
-  uint8_t battery_level;
-
-  adc_start();
-
+uint8_t get_battery_level(void) {
+  uint8_t battery_level = 0;
 #ifdef USE_BATTERY_PIN
   m_vbat_history[m_vbat_history_index] = get_vcc();
   m_vbat_history_index++;
@@ -412,6 +413,10 @@ static void battery_level_update(void) {
   for (uint8_t i = 0; i < m_vbat_history_length; i++) {
     sum += m_vbat_history[i];
   }
+  int16_t vbat = sum / m_vbat_history_length;
+#ifdef UBMK
+  battery_level = UBMK_API->util.mvToPercent((float)vbat);
+#else // NOT UBMK
 # ifndef BATTERY_VMAX
 #   define V_MAX 4200
 # else
@@ -422,10 +427,6 @@ static void battery_level_update(void) {
 # else
 #   define V_MIN BATTERY_VMIN
 # endif
-  int16_t vbat = sum / m_vbat_history_length;
-#ifdef UBMK
-  battery_level = UBMK_API->util.mvToPercent((float)vbat);
-#else // NOT UBMK
   int16_t diff = vbat - V_MIN;
   if (diff < 0) {
     diff = 0;
@@ -449,6 +450,20 @@ static void battery_level_update(void) {
   battery_level = get_vcc() / 30;
 #endif
 #endif
+  low_battery = (battery_level <= 10);
+  return battery_level;
+}
+
+bool is_low_battery(void) {
+  return low_battery;
+}
+
+/**@brief Function for performing a battery measurement, and update the Battery Level characteristic in the Battery Service.
+ */
+static void battery_level_update(void) {
+  ret_code_t err_code;
+  adc_start();
+  uint8_t battery_level = get_battery_level();
 
   err_code = ble_bas_battery_level_update(&m_bas, battery_level,
       BLE_CONN_HANDLE_ALL);
@@ -960,6 +975,8 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
   default:
     break;
   }
+
+  peer_connected_event();
 }
 
 /**@brief Function for handling BLE events.
@@ -1038,6 +1055,8 @@ static void on_ble_peripheral_evt(ble_evt_t const * p_ble_evt) {
     // No implementation needed.
     break;
   }
+
+  peer_connected_event();
 }
 
 /**@brief Function for handling BLE events.
@@ -1360,11 +1379,18 @@ void restart_advertising_wo_whitelist() {
   }
 }
 
-pm_peer_id_t get_current_peer_id(void) {
-  return m_peer_id;
+uint8_t get_current_peer_id(void) {
+  if (m_conn_handle == BLE_CONN_HANDLE_INVALID) {
+    return -1;
+  }
+  return (uint8_t)m_peer_id;
 }
 
 void restart_advertising_id(uint8_t id) {
+  if (id >= MAX_DEVICE) {
+    return;
+  }
+
   ret_code_t ret;
 
   if (m_conn_handle != BLE_CONN_HANDLE_INVALID) {

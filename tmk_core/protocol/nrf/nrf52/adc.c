@@ -75,7 +75,11 @@ void adc_start() {
 
 uint16_t get_vcc() {
 #ifdef UBMK
+  #ifdef VDIV_PIN
   return UBMK_API->gpio.analogReadMv(VDIV_PIN);
+  #else
+  return 0;
+  #endif
 #else // NOT UBMK
   int16_t v = adc_buffer[0] < 0 ? 0 : adc_buffer[0];
 #ifdef USE_BATTERY_PIN

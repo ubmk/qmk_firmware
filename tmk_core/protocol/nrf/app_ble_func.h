@@ -37,11 +37,15 @@ void restart_advertising_wo_whitelist(void);
 void restart_advertising_id(uint8_t id);
 void delete_bonds(void);
 void delete_bond_id(uint8_t id);
+uint8_t get_current_peer_id(void);
+void peer_connected_event(void);
 
 void start_dfu();
 void sleep_mode_enter();
 
 uint16_t get_vcc();
+uint8_t get_battery_level(void);
+bool is_low_battery(void);
 
 #ifdef NRF_SEPARATE_KEYBOARD_SLAVE
 #define get_ble_enabled() false

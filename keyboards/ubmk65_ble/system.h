@@ -10,9 +10,9 @@
 #ifdef KEYBOARD_NAME
 #define PRODUCT KEYBOARD_NAME
 #else
-#define PRODUCT ubmk65
+#define PRODUCT Ubmk65
 #endif
-#define DESCRIPTION UBMK65 Keyboard
+#define DESCRIPTION Ubmk65 Keyboard
 
 /* key matrix size */
 #define MATRIX_ROWS 9
@@ -43,6 +43,10 @@
 #define SLEEP_DELAY          300 // 300(s)
 #endif
 // #define WEEKUP_ANY_KEY
+
+#ifndef MAX_DEVICE
+#define MAX_DEVICE           3
+#endif
 
 #ifndef HID_BLE_SPEED
 #define HID_BLE_SPEED        3
