@@ -16,26 +16,14 @@ typedef enum {
     HIGH = (0x1)
 } pin_state_t;
 
-typedef struct {
-    void (*mode)(uint32_t ulPin, pin_mode_t ulMode);
-    void (*write)(uint32_t ulPin, pin_state_t ulVal);
-    void (*set)(uint32_t ulPin);
-    void (*clear)(uint32_t ulPin);
-    pin_state_t (*read)(uint32_t ulPin);
-    void (*toggle)(uint32_t pin);
-    uint32_t (*analogRead)(uint32_t ulPin);
-    float (*analogReadMv)(uint32_t ulPin);
-} ubmk_gpio_t;
+void ubmk_pinMode(uint32_t ulPin, pin_mode_t ulMode);
+void ubmk_pinWrite(uint32_t ulPin, pin_state_t ulVal);
+void ubmk_pinSet(uint32_t ulPin);
+void ubmk_pinClear(uint32_t ulPin);
+pin_state_t ubmk_pinRead(uint32_t ulPin);
+void ubmk_pinToggle(uint32_t pin);
+uint32_t ubmk_analogRead(uint32_t ulPin);
+float ubmk_analogReadMv(uint32_t ulPin);
 
-typedef struct {
-    void (*delay)(uint32_t number_of_ms);
-    uint8_t (*mvToPercent)(float mvolts);
-} ubmk_util_t;
-
-typedef struct {
-    uint32_t apiVersion;
-    ubmk_gpio_t     gpio;
-    ubmk_util_t     util;
-} ubmk_api_t;
-
-#define UBMK_API ((ubmk_api_t*)0xFC800)
+void ubmk_delay(uint32_t number_of_ms);
+uint8_t ubmk_mvToPercent(float mvolts);

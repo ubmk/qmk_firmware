@@ -54,6 +54,11 @@ else
   endif
 endif
 
+ifeq ($(UBMK),yes)
+  SRC += $(NRF_DIR)/ubmk.c
+  SRC += $(NRF_DIR)/ubmk_kb.c
+endif
+
 VPATH += $(TMK_PATH)/$(PROTOCOL_DIR)
 VPATH += $(TMK_PATH)/$(NRF_DIR)
 

@@ -127,20 +127,20 @@ void sleep_mode_enter(void) {
   extern const uint32_t col_pins[THIS_DEVICE_COLS];
 
 #ifdef UBMK
-  UBMK_API->util.delay(1000);
+  ubmk_delay(1000);
 #ifdef WEEKUP_KEYS
   const uint32_t weekUpKey[2] = WEEKUP_KEYS;
-  UBMK_API->gpio.mode(row_pins[weekUpKey[0]], OUTPUT);
-  UBMK_API->gpio.clear(row_pins[weekUpKey[0]]);
-  UBMK_API->gpio.mode(col_pins[weekUpKey[1]], INPUT_PULLUP_SENSE);
+  ubmk_pinMode(row_pins[weekUpKey[0]], OUTPUT);
+  ubmk_pinClear(row_pins[weekUpKey[0]]);
+  ubmk_pinMode(col_pins[weekUpKey[1]], INPUT_PULLUP_SENSE);
 #else
   int i;
   for (i=0; i<THIS_DEVICE_ROWS; i++) {
-    UBMK_API->gpio.mode(row_pins[i], OUTPUT);
-    UBMK_API->gpio.clear(row_pins[i]);
+    ubmk_pinMode(row_pins[i], OUTPUT);
+    ubmk_pinClear(row_pins[i]);
   }
   for (i=0; i<THIS_DEVICE_COLS; i++) {
-    UBMK_API->gpio.mode(col_pins[i], INPUT_PULLUP_SENSE);
+    ubmk_pinMode(col_pins[i], INPUT_PULLUP_SENSE);
   }
 #endif
 

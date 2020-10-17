@@ -41,9 +41,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 void adc_init() {
 #if defined(UBMK) && defined(VDIV_PIN)
-  UBMK_API->gpio.mode(VDIV_PIN, INPUT);
+  ubmk_pinMode(VDIV_PIN, INPUT);
   #ifdef VDIV_PIN_OTHER
-  UBMK_API->gpio.mode(VDIV_PIN_OTHER, INPUT);
+  ubmk_pinMode(VDIV_PIN_OTHER, INPUT);
   #endif
 #else
   nrf_drv_saadc_config_t adccfg = NRF_DRV_SAADC_DEFAULT_CONFIG;
@@ -71,7 +71,7 @@ void adc_start() {
 
 uint16_t get_vcc() {
 #if defined(UBMK) && defined(VDIV_PIN)
-  return UBMK_API->gpio.analogReadMv(VDIV_PIN);
+  return ubmk_analogReadMv(VDIV_PIN);
 #else
   int16_t v = adc_buffer[0] < 0 ? 0 : adc_buffer[0];
   #ifdef USE_BATTERY_PIN

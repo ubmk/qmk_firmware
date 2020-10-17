@@ -455,7 +455,7 @@ static void init_rows() {
 #if DIODE_DIRECTION == ROW2COL
   for(int i=0; i<THIS_DEVICE_ROWS; i++) {
     #ifdef UBMK
-    UBMK_API->gpio.mode(row_pins[i], INPUT_PULLUP);
+    ubmk_pinMode(row_pins[i], INPUT_PULLUP);
     #else // Not UBMK
     nrf_gpio_cfg_input(row_pins[i], NRF_GPIO_PIN_PULLUP);
     #endif
@@ -463,7 +463,7 @@ static void init_rows() {
 #else
   for(int i=0; i<THIS_DEVICE_ROWS; i++) {
     #ifdef UBMK
-    UBMK_API->gpio.mode(row_pins[i], OUTPUT);
+    ubmk_pinMode(row_pins[i], OUTPUT);
     #else // Not UBMK
     nrf_gpio_cfg(row_pins[i],
         NRF_GPIO_PIN_DIR_OUTPUT,
@@ -482,7 +482,7 @@ static void  init_cols(void)
 #if DIODE_DIRECTION == ROW2COL
   for(int i=0; i<THIS_DEVICE_COLS; i++) {
     #ifdef UBMK
-    UBMK_API->gpio.mode(col_pins[i], OUTPUT);
+    ubmk_pinMode(col_pins[i], OUTPUT);
     #else // Not UBMK
     nrf_gpio_cfg(col_pins[i],
         NRF_GPIO_PIN_DIR_OUTPUT,
@@ -495,7 +495,7 @@ static void  init_cols(void)
 #else
   for(int i=0; i<THIS_DEVICE_COLS; i++) {
     #ifdef UBMK
-    UBMK_API->gpio.mode(col_pins[i], INPUT_PULLUP);
+    ubmk_pinMode(col_pins[i], INPUT_PULLUP);
     #else // Not UBMK
     nrf_gpio_cfg_input(col_pins[i], NRF_GPIO_PIN_PULLUP);
     #endif
@@ -529,7 +529,7 @@ matrix_col_t read_rows(void)
   matrix_col_t col = 0;
   for (int i=0; i<THIS_DEVICE_ROWS; i++) {
     #ifdef UBMK
-    col |= ((UBMK_API->gpio.read(row_pins[i]) ? 0 : 1) << i);
+    col |= ((ubmk_pinRead(row_pins[i]) ? 0 : 1) << i);
     #else // Not UBMK
     col |= ((nrf_gpio_pin_read(row_pins[i]) ? 0 : 1) << i);
     #endif
@@ -551,7 +551,7 @@ void unselect_cols(void)
 {
   for(int i=0; i<THIS_DEVICE_COLS; i++) {
     #ifdef UBMK
-    UBMK_API->gpio.set(col_pins[i]);
+    ubmk_pinSet(col_pins[i]);
     #else // Not UBMK
     nrf_gpio_pin_set(col_pins[i]);
     #endif
@@ -561,7 +561,7 @@ void unselect_cols(void)
 void select_col(uint8_t col)
 {
     #ifdef UBMK
-    UBMK_API->gpio.clear(col_pins[col]);
+    ubmk_pinClear(col_pins[col]);
     #else // Not UBMK
     nrf_gpio_pin_clear(col_pins[col]);
     #endif
@@ -574,7 +574,7 @@ matrix_row_t read_cols(void)
   matrix_row_t row = 0;
   for (int i=0; i<THIS_DEVICE_COLS; i++) {
     #ifdef UBMK
-    row |= ((UBMK_API->gpio.read(col_pins[i]) ? 0 : 1) << i);
+    row |= ((ubmk_pinRead(col_pins[i]) ? 0 : 1) << i);
     #else
     row |= ((nrf_gpio_pin_read(col_pins[i]) ? 0 : 1) << i);
     #endif
@@ -602,7 +602,7 @@ void unselect_rows(void)
 {
   for(int i=0; i<THIS_DEVICE_ROWS; i++) {
     #ifdef UBMK
-    UBMK_API->gpio.set(row_pins[i]);
+    ubmk_pinSet(row_pins[i]);
     #else // Not UBMK
     nrf_gpio_pin_set(row_pins[i]);
     #endif
@@ -612,7 +612,7 @@ void unselect_rows(void)
 void select_row(uint8_t row)
 {
     #ifdef UBMK
-    UBMK_API->gpio.clear(row_pins[row]);
+    ubmk_pinClear(row_pins[row]);
     #else // Not UBMK
     nrf_gpio_pin_clear(row_pins[row]);
     #endif

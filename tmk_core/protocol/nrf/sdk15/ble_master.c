@@ -108,6 +108,9 @@
 #define APP_ADV_SLOW_DURATION               18000                                      /**< The advertising duration of slow advertising in units of 10 milliseconds. */
 
 /*lint -emacro(524, MIN_CONN_INTERVAL) // Loss of precision */
+#ifndef BLE_HID_MIN_INTERVAL
+  #define BLE_HID_MIN_INTERVAL 30
+#endif
 #ifndef BLE_HID_MAX_INTERVAL
   #define BLE_HID_MAX_INTERVAL 90
 #endif
@@ -117,7 +120,7 @@
 //#ifndef BLE_HID_TIMEOUT
 //  #define BLE_HID_TIMEOUT 1000
 //#endif
-#define MIN_CONN_INTERVAL                   MSEC_TO_UNITS(30, UNIT_1_25_MS)           /**< Minimum connection interval (7.5 ms) */
+#define MIN_CONN_INTERVAL                   MSEC_TO_UNITS(BLE_HID_MIN_INTERVAL, UNIT_1_25_MS)           /**< Minimum connection interval (7.5 ms) */
 #define MAX_CONN_INTERVAL                   MSEC_TO_UNITS(BLE_HID_MAX_INTERVAL, UNIT_1_25_MS)            /**< Maximum connection interval (30 ms). */
 #define SLAVE_LATENCY                       BLE_HID_SLAVE_LATENCY                                          /**< Slave latency. */
 #define CONN_SUP_TIMEOUT                    MSEC_TO_UNITS((SLAVE_LATENCY+2)*BLE_HID_MAX_INTERVAL*2, UNIT_10_MS)             /**< Connection supervisory timeout (430 ms). */
@@ -415,7 +418,7 @@ uint8_t get_battery_level(void) {
   }
   int16_t vbat = sum / m_vbat_history_length;
 # if defined(UBMK) && defined(VDIV_PIN)
-  battery_level = UBMK_API->util.mvToPercent((float)vbat);
+  battery_level = ubmk_mvToPercent((float)vbat);
 # else
 
 #   ifndef BATTERY_VMAX
