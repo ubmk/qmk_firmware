@@ -2,8 +2,7 @@
 #define UBMK_SYSTEM_H
 
 /* USB Device descriptor parameter */
-#define VENDOR_ID       0xFEED
-#define PRODUCT_ID      0x0012
+#define VENDOR_ID       0x5559
 /* in python2: list(u"whatever".encode('utf-16-le')) */
 /*   at most 32 characters or the ugly hack in usb_main.c borks */
 #define MANUFACTURER uybv
