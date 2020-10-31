@@ -6,9 +6,19 @@
 #include "ubmk.h"
 #include "ubmk_kb.h"
 
+static bool usbConnected = false;
+
 const uint32_t __sleepDelay = SLEEP_DELAY * 1000;
 static uint32_t __lastTimePressed = 0;
 static bool __sleeped = false;
+
+static uint32_t __batIndicator = 0;
+static bool __batIndicatorState = false;
+static uint32_t __deviceIndicator = 0;
+static bool __deviceIndicatorState = false;
+
+void ubmk_sleep_mode_validate(void);
+void ubmk_force_bootloader(void);
 
 void ubmk_init() {
     #ifdef LED_PIN0
@@ -53,18 +63,33 @@ void ubmk_init() {
     #ifdef LED_PIN0
     ubmk_pinClear(LED_PIN3);
     #endif
+
+    ubmk_force_bootloader();
 }
 
 void ubmk_scan(void) {
-    if (nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_CONNECTED ||
-        nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_READY) {
-        return;
+    if (__batIndicator > 0) {
+        if (timer_elapsed32(__batIndicator) > 6000) {
+            __batIndicator = 0;
+            ubmk_bat_indicator(false);
+        } else {
+            ubmk_bat_indicator(true);
+        }
     }
 
-    if (__sleeped == false && __sleepDelay > 0 && (timer_elapsed32(__lastTimePressed) > __sleepDelay)) {
-        __sleeped = true;
-        sleep_mode_enter();
+    if (__deviceIndicator > 0) {
+        if (timer_elapsed32(__deviceIndicator) > 6000) {
+            __deviceIndicator = 0;
+            ubmk_device_indicator(false);
+        } else {
+            ubmk_device_indicator(true);
+        }
     }
+
+    ubmk_force_bootloader();
+    ubmk_sleep_mode_validate();
+
+    /*
   #ifdef VDIV_PIN
     #ifdef LED_PIN0
     if (is_low_battery()) {
@@ -78,10 +103,40 @@ void ubmk_scan(void) {
     }
     #endif
   #endif
+  */
+}
+
+void ubmk_force_bootloader(void) {
+    bool _usbConnected = nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_CONNECTED || nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_READY;
+    if (_usbConnected != usbConnected) {
+        usbConnected = _usbConnected;
+        if (usbConnected) {
+            extern const uint32_t row_pins[THIS_DEVICE_ROWS];
+            extern const uint32_t col_pins[THIS_DEVICE_COLS];
+            // ubmk_pinMode(row_pins[0], OUTPUT);
+            // ubmk_pinMode(col_pins[0], INPUT_PULLUP);
+            ubmk_pinClear(row_pins[0]);
+            if (ubmk_pinRead(col_pins[0]) == LOW) {
+                bootloader_jump();
+            }
+        }
+    }
+}
+
+void ubmk_sleep_mode_validate(void) {
+    if (nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_CONNECTED ||
+        nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_READY) {
+        return;
+    }
+
+    if (__sleeped == false && __sleepDelay > 0 && (timer_elapsed32(__lastTimePressed) > __sleepDelay)) {
+        __sleeped = true;
+        sleep_mode_enter();
+    }
 }
 
 bool ubmk_process_record(uint16_t keycode, keyrecord_t *record) {
-    char str[16];
+    char str[128];
     bool result = true;
     if (record->event.pressed) {
         __lastTimePressed = timer_read32();
@@ -161,8 +216,14 @@ bool ubmk_process_record(uint16_t keycode, keyrecord_t *record) {
                 result = false;
                 break;
             case BATT_LV:
-                sprintf(str, "%4dmV => %2d%% \n", (uint16_t)get_vcc(), (uint16_t)get_battery_level());
+                __batIndicator = timer_read32();
+                // (uint16_t)get_vcc()
+                sprintf(str, "%2d%%", (uint16_t)get_battery_level());
                 send_string(str);
+                result = false;
+                break;
+            case DEVICE_ID:
+                __deviceIndicator = timer_read32();
                 result = false;
                 break;
             case ENT_DFU:
@@ -192,29 +253,7 @@ void ubmk_led_set(uint8_t usb_led) {
 }
 
 void peer_connected_event(void) {
-    uint8_t current_peer_id = get_current_peer_id();
-
-    #ifdef LED_PIN1
-    if (current_peer_id == 0) {
-        ubmk_pinSet(LED_PIN1);
-    } else {
-        ubmk_pinClear(LED_PIN1);
-    }
-    #endif
-    #ifdef LED_PIN2
-    if (current_peer_id == 1) {
-        ubmk_pinSet(LED_PIN2);
-    } else {
-        ubmk_pinClear(LED_PIN2);
-    }
-    #endif
-    #ifdef LED_PIN3
-    if (current_peer_id == 2) {
-        ubmk_pinSet(LED_PIN3);
-    } else {
-        ubmk_pinClear(LED_PIN3);
-    }
-    #endif
+    // __deviceIndicator = timer_read32();
 }
 
 void before_sleep_mode_enter(void) {
@@ -233,4 +272,86 @@ void before_sleep_mode_enter(void) {
     #ifdef LED_PIN3
     ubmk_pinClear(LED_PIN3);
     #endif
+}
+
+void ubmk_device_indicator(bool state) {
+#if defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
+    if (state && !__deviceIndicatorState) {
+        __deviceIndicatorState = true;
+        uint8_t current_peer_id = get_current_peer_id();
+        #ifdef LED_PIN1
+        if (current_peer_id == 0) {
+            ubmk_pinSet(LED_PIN1);
+        } else {
+            ubmk_pinClear(LED_PIN1);
+        }
+        #endif
+        #ifdef LED_PIN2
+        if (current_peer_id == 1) {
+            ubmk_pinSet(LED_PIN2);
+        } else {
+            ubmk_pinClear(LED_PIN2);
+        }
+        #endif
+        #ifdef LED_PIN3
+        if (current_peer_id == 2) {
+            ubmk_pinSet(LED_PIN3);
+        } else {
+            ubmk_pinClear(LED_PIN3);
+        }
+        #endif
+    } else if (!state && __deviceIndicatorState) {
+        __deviceIndicatorState = false;
+        #ifdef LED_PIN1
+        ubmk_pinClear(LED_PIN1);
+        #endif
+        #ifdef LED_PIN2
+        ubmk_pinClear(LED_PIN2);
+        #endif
+        #ifdef LED_PIN3
+        ubmk_pinClear(LED_PIN3);
+        #endif
+    }
+#endif
+}
+
+void ubmk_bat_indicator(bool state) {
+#if defined(LED_PIN0) || defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
+    if (state && !__batIndicatorState) {
+        __batIndicatorState = true;
+        uint8_t bat_level = get_battery_level();
+        #ifdef LED_PIN0
+        ubmk_pinSet(LED_PIN0);
+        #endif
+        if (bat_level >= 25) {
+            #ifdef LED_PIN1
+            ubmk_pinSet(LED_PIN1);
+            #endif
+        }
+        if (bat_level >= 50) {
+            #ifdef LED_PIN2
+            ubmk_pinSet(LED_PIN2);
+            #endif
+        }
+        if (bat_level >= 75) {
+            #ifdef LED_PIN3
+            ubmk_pinSet(LED_PIN3);
+            #endif
+        }
+    } else if (!state && __batIndicatorState) {
+        __batIndicatorState = false;
+        #ifdef LED_PIN0
+        ubmk_pinClear(LED_PIN0);
+        #endif
+        #ifdef LED_PIN1
+        ubmk_pinClear(LED_PIN1);
+        #endif
+        #ifdef LED_PIN2
+        ubmk_pinClear(LED_PIN2);
+        #endif
+        #ifdef LED_PIN3
+        ubmk_pinClear(LED_PIN3);
+        #endif
+    }
+#endif
 }
