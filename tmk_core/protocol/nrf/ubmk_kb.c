@@ -12,10 +12,14 @@ const uint32_t __sleepDelay = SLEEP_DELAY * 1000;
 static uint32_t __lastTimePressed = 0;
 static bool __sleeped = false;
 
+#if defined(LED_PIN0) || defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
 static uint32_t __batIndicator = 0;
 static bool __batIndicatorState = false;
+#endif
+#if defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
 static uint32_t __deviceIndicator = 0;
 static bool __deviceIndicatorState = false;
+#endif
 
 void ubmk_sleep_mode_validate(void);
 void ubmk_force_bootloader(void);
@@ -68,6 +72,7 @@ void ubmk_init() {
 }
 
 void ubmk_scan(void) {
+#if defined(LED_PIN0) || defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
     if (__batIndicator > 0) {
         if (timer_elapsed32(__batIndicator) > 6000) {
             __batIndicator = 0;
@@ -76,7 +81,8 @@ void ubmk_scan(void) {
             ubmk_bat_indicator(true);
         }
     }
-
+#endif
+#if defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
     if (__deviceIndicator > 0) {
         if (timer_elapsed32(__deviceIndicator) > 6000) {
             __deviceIndicator = 0;
@@ -85,6 +91,7 @@ void ubmk_scan(void) {
             ubmk_device_indicator(true);
         }
     }
+#endif
 
     ubmk_force_bootloader();
     ubmk_sleep_mode_validate();
@@ -216,14 +223,18 @@ bool ubmk_process_record(uint16_t keycode, keyrecord_t *record) {
                 result = false;
                 break;
             case BATT_LV:
+                #if defined(LED_PIN0) || defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
                 __batIndicator = timer_read32();
+                #endif
                 // (uint16_t)get_vcc()
                 sprintf(str, "%2d%%", (uint16_t)get_battery_level());
                 send_string(str);
                 result = false;
                 break;
             case DEVICE_ID:
+                #if defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
                 __deviceIndicator = timer_read32();
+                #endif
                 result = false;
                 break;
             case ENT_DFU:
