@@ -36,10 +36,15 @@
  * | 80 | 81 | 82 |           83          | 84| 85| 86| 87| 77| 57|
  * `--------------------------------------------------------------'
  *
- * Bỏ chỉ định phím gọi dậy bằng cách đặt dấu comment (//) trước dòng #define WEEKUP_KEYS...
+ * Bỏ chỉ định phím gọi dậy bằng cách đặt dấu comment (//) trước dòng #define WAKEUP_KEYS...
  * Khi không được chỉ định, bàn phím được gọi dậy bằng cách nhấn một phím bất kỳ
  */
-#define WEEKUP_KEYS { 5, 6 }
+
+#if defined(WAKEKUP_KEY_NUM) && (WAKEKUP_KEY_NUM == 0)
+#undef WAKEKUP_KEY_NUM
+#endif
+
+#define WAKEUP_KEYS { { 0, 0 }, { 5, 6 }, { 1, 6 } }
 
 // Tốc độ phản hồi BLE của phím, giá trị từ 1 -> 5, càng cao tốc độ càng nhanh, thời lượng sử dụng pin càng giảm
 #define HID_BLE_SPEED       5

@@ -128,11 +128,12 @@ void sleep_mode_enter(void) {
 
 #ifdef UBMK
   ubmk_delay(1000);
-#ifdef WEEKUP_KEYS
-  const uint32_t weekUpKey[2] = WEEKUP_KEYS;
-  ubmk_pinMode(row_pins[weekUpKey[0]], OUTPUT);
-  ubmk_pinClear(row_pins[weekUpKey[0]]);
-  ubmk_pinMode(col_pins[weekUpKey[1]], INPUT_PULLUP_SENSE);
+#ifdef WAKEKUP_KEY_NUM
+  const int keyNum = WAKEKUP_KEY_NUM - 1;
+  const uint32_t weekUpKeys[3][2] = WAKEUP_KEYS;
+  ubmk_pinMode(row_pins[weekUpKeys[keyNum][0]], OUTPUT);
+  ubmk_pinClear(row_pins[weekUpKeys[keyNum][0]]);
+  ubmk_pinMode(col_pins[weekUpKeys[keyNum][1]], INPUT_PULLUP_SENSE);
 #else
   int i;
   for (i=0; i<THIS_DEVICE_ROWS; i++) {

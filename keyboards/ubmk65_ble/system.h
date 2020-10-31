@@ -41,7 +41,6 @@
 #ifndef SLEEP_DELAY
 #define SLEEP_DELAY          300 // 300(s)
 #endif
-// #define WEEKUP_ANY_KEY
 
 #ifndef MAX_DEVICE
 #define MAX_DEVICE           3

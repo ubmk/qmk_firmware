@@ -11,10 +11,10 @@
 #endif
 #define SLEEP_DELAY 600
 
-#ifdef WEEKUP_KEYS
-#undef WEEKUP_KEYS
+#ifdef WAKEKUP_KEY_NUM
+#undef WAKEKUP_KEY_NUM
 #endif
-#define WEEKUP_KEYS { 4, 6 }
+#define WAKEKUP_KEY_NUM 2
 
 #ifdef HID_BLE_SPEED
 #undef HID_BLE_SPEED
