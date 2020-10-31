@@ -6,23 +6,27 @@
 #include "ubmk.h"
 #include "ubmk_kb.h"
 
+#define BAT_INDICATOR_ON (defined(LED_PIN0) || defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3))
+#define DEVICE_INDICATOR_ON defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
+#define INDICATOR_TIMEOUT(startAt) (timer_elapsed32(startAt) > 6000)
+#define IS_SLEEP_NOW(lastActionAt) (SLEEP_DELAY > 0 && timer_elapsed32(lastActionAt) > SLEEP_DELAY * 1000)
+#define HAS_USD_CONNECTED (nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_CONNECTED || nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_READY)
+void ubmk_sleep_mode_validate(void);
+void ubmk_force_bootloader(void);
+
 static bool usbConnected = false;
 
-const uint32_t __sleepDelay = SLEEP_DELAY * 1000;
 static uint32_t __lastTimePressed = 0;
 static bool __sleeped = false;
 
-#if defined(LED_PIN0) || defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
+#if BAT_INDICATOR_ON
 static uint32_t __batIndicator = 0;
 static bool __batIndicatorState = false;
 #endif
-#if defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
+#if DEVICE_INDICATOR_ON
 static uint32_t __deviceIndicator = 0;
 static bool __deviceIndicatorState = false;
 #endif
-
-void ubmk_sleep_mode_validate(void);
-void ubmk_force_bootloader(void);
 
 void ubmk_init() {
     #ifdef LED_PIN0
@@ -72,9 +76,9 @@ void ubmk_init() {
 }
 
 void ubmk_scan(void) {
-#if defined(LED_PIN0) || defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
+#if BAT_INDICATOR_ON
     if (__batIndicator > 0) {
-        if (timer_elapsed32(__batIndicator) > 6000) {
+        if (INDICATOR_TIMEOUT(__batIndicator)) {
             __batIndicator = 0;
             ubmk_bat_indicator(false);
         } else {
@@ -82,9 +86,9 @@ void ubmk_scan(void) {
         }
     }
 #endif
-#if defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
+#if DEVICE_INDICATOR_ON
     if (__deviceIndicator > 0) {
-        if (timer_elapsed32(__deviceIndicator) > 6000) {
+        if (INDICATOR_TIMEOUT(__deviceIndicator)) {
             __deviceIndicator = 0;
             ubmk_device_indicator(false);
         } else {
@@ -114,7 +118,7 @@ void ubmk_scan(void) {
 }
 
 void ubmk_force_bootloader(void) {
-    bool _usbConnected = nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_CONNECTED || nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_READY;
+    bool _usbConnected = HAS_USD_CONNECTED;
     if (_usbConnected != usbConnected) {
         usbConnected = _usbConnected;
         if (usbConnected) {
@@ -131,12 +135,11 @@ void ubmk_force_bootloader(void) {
 }
 
 void ubmk_sleep_mode_validate(void) {
-    if (nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_CONNECTED ||
-        nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_READY) {
+    if (HAS_USD_CONNECTED) {
         return;
     }
 
-    if (__sleeped == false && __sleepDelay > 0 && (timer_elapsed32(__lastTimePressed) > __sleepDelay)) {
+    if (__sleeped == false && IS_SLEEP_NOW(__lastTimePressed)) {
         __sleeped = true;
         sleep_mode_enter();
     }
@@ -223,7 +226,7 @@ bool ubmk_process_record(uint16_t keycode, keyrecord_t *record) {
                 result = false;
                 break;
             case BATT_LV:
-                #if defined(LED_PIN0) || defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
+                #if BAT_INDICATOR_ON
                 __batIndicator = timer_read32();
                 #endif
                 // (uint16_t)get_vcc()
@@ -232,7 +235,7 @@ bool ubmk_process_record(uint16_t keycode, keyrecord_t *record) {
                 result = false;
                 break;
             case DEVICE_ID:
-                #if defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
+                #if DEVICE_INDICATOR_ON
                 __deviceIndicator = timer_read32();
                 #endif
                 result = false;
@@ -286,7 +289,7 @@ void before_sleep_mode_enter(void) {
 }
 
 void ubmk_device_indicator(bool state) {
-#if defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
+#if DEVICE_INDICATOR_ON
     if (state && !__deviceIndicatorState) {
         __deviceIndicatorState = true;
         uint8_t current_peer_id = get_current_peer_id();
@@ -327,7 +330,7 @@ void ubmk_device_indicator(bool state) {
 }
 
 void ubmk_bat_indicator(bool state) {
-#if defined(LED_PIN0) || defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
+#if BAT_INDICATOR_ON
     if (state && !__batIndicatorState) {
         __batIndicatorState = true;
         uint8_t bat_level = get_battery_level();
