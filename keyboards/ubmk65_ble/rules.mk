@@ -9,6 +9,8 @@ SLEEP_LED_ENABLE = no  # Breathing sleep LED during USB suspend
 NKRO_ENABLE = no	    # USB Nkey Rollover
 CUSTOM_MATRIX = yes # This flag should be on for nrf52
 
+NO_USB_STARTUP_CHECK = yes
+
 ## chip/board settings
 MCU_FAMILY = NRF52
 # linker script to use

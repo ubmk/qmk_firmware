@@ -28,6 +28,8 @@
 /* Set 0 if debouncing isn't needed */
 #define DEBOUNCE    1
 
+#define TAPPING_TERM 200
+
 /* Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap */
 #define LOCKING_SUPPORT_ENABLE
 /* Locking resynchronize hack */
@@ -37,6 +39,8 @@
 #define IS_COMMAND() ( \
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)) \
 )
+
+#define PROGMEM // arm-gcc does not interpret PROGMEM
 
 #ifndef SLEEP_DELAY
 #define SLEEP_DELAY          300 // 300(s)
