@@ -221,7 +221,7 @@ bool process_record_user_rgb(uint16_t keycode, keyrecord_t *record) {
     case KC_INSERT ... KC_UP:
     case KC_KP_SLASH ... KC_KP_DOT:
     case KC_F13 ... KC_F24:
-    case KC_AUDIO_MUTE ... KC_MEDIA_REWIND:
+    case KC_AUDIO_MUTE ... KC_BRIGHTNESS_DOWN:
       if (record->event.pressed) { start_rgb_light(); }
       return true; break;
 #endif // RGBLIGHT_TWINKLE

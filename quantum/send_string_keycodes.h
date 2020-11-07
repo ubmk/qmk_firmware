@@ -204,4 +204,6 @@
 #define X_WWW_FAVORITES      ba
 #define X_MEDIA_FAST_FORWARD bb
 #define X_MEDIA_REWIND       bc
+#define X_BRIGHTNESS_UP      bd
+#define X_BRIGHTNESS_DOWN    be
 #endif

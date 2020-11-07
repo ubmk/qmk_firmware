@@ -65,6 +65,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TRANSPORT_REWIND        0x00B4
 #define TRANSPORT_EJECT         0x00B8
 #define AC_MINIMIZE             0x0206
+#define BRIGHTNESS_UP           0x006F
+#define BRIGHTNESS_DOWN         0x0070
 
 /* Generic Desktop Page(0x01) - system power control */
 #define SYSTEM_POWER_DOWN       0x0081
@@ -161,6 +163,8 @@ typedef struct {
     (key == KC_MEDIA_PREV_TRACK ?  TRANSPORT_PREV_TRACK : \
     (key == KC_MEDIA_FAST_FORWARD ?  TRANSPORT_FAST_FORWARD : \
     (key == KC_MEDIA_REWIND     ?  TRANSPORT_REWIND : \
+    (key == KC_BRIGHTNESS_UP     ?  BRIGHTNESS_UP : \
+    (key == KC_BRIGHTNESS_DOWN     ?  BRIGHTNESS_DOWN : \
     (key == KC_MEDIA_STOP       ?  TRANSPORT_STOP : \
     (key == KC_MEDIA_EJECT      ?  TRANSPORT_STOP_EJECT : \
     (key == KC_MEDIA_PLAY_PAUSE ?  TRANSPORT_PLAY_PAUSE : \
@@ -174,7 +178,7 @@ typedef struct {
     (key == KC_WWW_FORWARD      ?  AC_FORWARD : \
     (key == KC_WWW_STOP         ?  AC_STOP : \
     (key == KC_WWW_REFRESH      ?  AC_REFRESH : \
-    (key == KC_WWW_FAVORITES    ?  AC_BOOKMARKS : 0)))))))))))))))))))))
+    (key == KC_WWW_FAVORITES    ?  AC_BOOKMARKS : 0)))))))))))))))))))))))
 
 uint8_t has_anykey(report_keyboard_t* keyboard_report);
 uint8_t get_first_key(report_keyboard_t* keyboard_report);
