@@ -129,27 +129,37 @@ void sleep_mode_enter(void) {
 
 #ifdef UBMK
   ubmk_delay(1000);
-#ifdef WAKEKUP_KEY_NUM
   for (int r = 0; r < MATRIX_ROWS; r++) {
     ubmk_pinMode(row_pins[r], DISABLE);
   }
   for (int c = 0; c < MATRIX_COLS; c++) {
     ubmk_pinMode(col_pins[c], DISABLE);
   }
-
-  for (int r = 0; r < MATRIX_ROWS; r++) {
-    for (int c = 0; c < MATRIX_COLS; c++) {
-      uint16_t keyCode = keymap_key_to_keycode(0, (keypos_t){ .col = c, .row = r });
-      if ((WAKEKUP_KEY_NUM == 1 && keyCode == KC_ESC) ||
-          (WAKEKUP_KEY_NUM == 2 && (keyCode == KC_ENT || keyCode == KC_PENT)) ||
-          (WAKEKUP_KEY_NUM == 3 && keyCode == KC_BSPC) ||
-          (WAKEKUP_KEY_NUM == 4 && keyCode == KC_TAB) ||
-          (WAKEKUP_KEY_NUM == 5 && keyCode == KC_SPC) || 
-          (WAKEKUP_KEY_NUM == 6 && keyCode == KC_CAPS)) {
-            ubmk_pinMode(row_pins[r], OUTPUT);
-            ubmk_pinClear(row_pins[r]);
-            ubmk_pinMode(col_pins[c], INPUT_PULLUP_SENSE); 
+#ifdef WAKEKUP_KEY_NUM
+  if (WAKEKUP_KEY_NUM != 0) {
+    for (int r = 0; r < MATRIX_ROWS; r++) {
+      for (int c = 0; c < MATRIX_COLS; c++) {
+        uint16_t keyCode = keymap_key_to_keycode(0, (keypos_t){ .col = c, .row = r });
+        if ((WAKEKUP_KEY_NUM == 1 && keyCode == KC_ESC) ||
+            (WAKEKUP_KEY_NUM == 2 && (keyCode == KC_ENT || keyCode == KC_PENT)) ||
+            (WAKEKUP_KEY_NUM == 3 && keyCode == KC_BSPC) ||
+            (WAKEKUP_KEY_NUM == 4 && keyCode == KC_TAB) ||
+            (WAKEKUP_KEY_NUM == 5 && keyCode == KC_SPC) || 
+            (WAKEKUP_KEY_NUM == 6 && keyCode == KC_CAPS)) {
+              ubmk_pinMode(row_pins[r], OUTPUT);
+              ubmk_pinClear(row_pins[r]);
+              ubmk_pinMode(col_pins[c], INPUT_PULLUP_SENSE); 
+        }
       }
+    }
+  } else {
+    int i;
+    for (i=0; i<THIS_DEVICE_ROWS; i++) {
+      ubmk_pinMode(row_pins[i], OUTPUT);
+      ubmk_pinClear(row_pins[i]);
+    }
+    for (i=0; i<THIS_DEVICE_COLS; i++) {
+      ubmk_pinMode(col_pins[i], INPUT_PULLUP_SENSE);
     }
   }
 #else
