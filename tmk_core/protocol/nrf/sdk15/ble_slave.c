@@ -394,6 +394,11 @@ void peer_manager_init() {
  */
 /**@snippet [Handling the data received over BLE] */
 static void nus_data_handler(ble_nus_evt_t * p_evt) {
+  // joric below this line
+  if (p_evt->type == BLE_NUS_EVT_RX_DATA)
+  {
+      ble_nus_recv_bytes((uint8_t*)p_evt->params.rx_data.p_data, (uint16_t)p_evt->params.rx_data.length);
+  }
 }
 /**@snippet [Handling the data received over BLE] */
 
@@ -804,6 +809,10 @@ void ble_disconnect() {
       APP_ERROR_CHECK(err_code);
     }
   }
+}
+
+bool ble_connected(void) {
+  return m_conn_handle != BLE_CONN_HANDLE_INVALID;
 }
 
 void advertising_start(void) {

@@ -258,6 +258,9 @@ void ble_disconnect() {
   }
 }
 
+bool ble_connected(void) {
+  return m_conn_handle != BLE_CONN_HANDLE_INVALID;
+}
 
 
 /**@brief Function for handling Peer Manager events.

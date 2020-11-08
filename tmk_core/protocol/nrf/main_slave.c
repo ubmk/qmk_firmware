@@ -34,10 +34,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const uint8_t MAINTASK_INTERVAL=MATRIX_SCAN_MS;
 
+int adc_counter = 0;
+
 void sendchar_pf(void *p, char c){
   UNUSED_VARIABLE(p);
   UNUSED_VARIABLE(c);
 };
+void eeprom_update(void);
 void timer_tick(uint8_t interval);
 static void slave_main_tasks(void* context) {
   timer_tick(MAINTASK_INTERVAL);
@@ -45,6 +48,10 @@ static void slave_main_tasks(void* context) {
 #if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_ANIMATIONS)
   rgblight_task();
 #endif
+  if ((adc_counter++)%250==0)
+    adc_start();
+
+  eeprom_update();
 }
 
 /**@brief Application main function.
@@ -55,6 +62,7 @@ int main(void) {
   timers_init(slave_main_tasks);
 
   usbd_init();
+  adc_init(); // added by joric!
 
   ble_stack_init();
   sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
@@ -107,4 +115,14 @@ __WEAK void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info)
     while(1) { continue; }
     app_error_save_and_stop(id, pc, info);
 #endif // DEBUG
+}
+
+extern void rgblight_update_sync(rgblight_syncinfo_t *syncinfo, bool write_to_eeprom);
+
+
+uint32_t ble_nus_recv_bytes(uint8_t* buf, uint16_t len) {
+  if (len == sizeof(rgblight_syncinfo_t)) {
+    rgblight_update_sync((rgblight_syncinfo_t*)buf, true);
+  }
+  return 0;
 }

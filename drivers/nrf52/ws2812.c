@@ -31,17 +31,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 nrfx_pwm_t pwm0 = NRFX_PWM_INSTANCE(0);
 
-#define DUMMY_SIGNAL_LEN 10
+#define DUMMY_SIGNAL_LEN 64 // 64 is pretty reliable
 
 void pwm_handler(nrfx_pwm_evt_type_t event_type) {
 
 }
 
 void ws2812_setleds(LED_TYPE *ledarray, uint16_t number_of_leds) {
+  /*
   if (nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_CONNECTED ||
       nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_READY) {
     ws2812_setleds_pin(ledarray, number_of_leds, RGB_DI_PIN);
   }
+  */
+  ws2812_setleds_pin(ledarray, number_of_leds, RGB_DI_PIN);
 }
 
 void ws2812_setleds_pin (LED_TYPE *ledarray, uint16_t number_of_leds,uint8_t pinmask){

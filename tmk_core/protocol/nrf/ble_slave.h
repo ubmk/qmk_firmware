@@ -1,6 +1,7 @@
 #ifndef _BLE_SLAVE_H_
 #define _BLE_SLAVE_H_
 
+#include "adc.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -19,5 +20,6 @@ void main_task_start(uint8_t interval_ms);
 void main_loop(void);
 
 uint32_t ble_nus_send_bytes(uint8_t* buf, uint16_t len);
+uint32_t ble_nus_recv_bytes(uint8_t* buf, uint16_t len);
 
 #endif //  _BLE_SLAVE_H_

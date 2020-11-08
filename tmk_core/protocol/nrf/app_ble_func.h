@@ -31,6 +31,8 @@ __WEAK void ble_nus_packetrcv_handler(ble_switch_state_t* buf, uint8_t len);
 __WEAK void ble_nus_on_disconnect();
 
 uint32_t ble_nus_send_bytes(uint8_t* buf, uint16_t len);
+uint32_t ble_nus_recv_bytes(uint8_t* buf, uint16_t len);
+uint32_t ble_nus_send_bytes_to_slave(uint8_t* buf, uint16_t len);
 
 void ble_disconnect();
 void restart_advertising_wo_whitelist(void);
@@ -47,6 +49,7 @@ void before_sleep_mode_enter(void);
 uint16_t get_vcc();
 uint8_t get_battery_level(void);
 bool is_low_battery(void);
+bool ble_connected(void);
 
 #ifdef NRF_SEPARATE_KEYBOARD_SLAVE
 #define get_ble_enabled() false
