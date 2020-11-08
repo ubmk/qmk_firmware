@@ -19,6 +19,6 @@
 #ifdef HID_BLE_SPEED
 #undef HID_BLE_SPEED
 #endif
-#define HID_BLE_SPEED 6
+#define HID_BLE_SPEED 8
 
 #endif // CONFIG_KEYMAP_H

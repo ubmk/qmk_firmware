@@ -127,14 +127,16 @@ void sleep_mode_enter(void) {
   extern const uint32_t row_pins[THIS_DEVICE_ROWS];
   extern const uint32_t col_pins[THIS_DEVICE_COLS];
 
+  before_sleep_mode_enter();
+
 #ifdef UBMK
-  ubmk_delay(1000);
   for (int r = 0; r < MATRIX_ROWS; r++) {
     ubmk_pinMode(row_pins[r], DISABLE);
   }
   for (int c = 0; c < MATRIX_COLS; c++) {
     ubmk_pinMode(col_pins[c], DISABLE);
   }
+  ubmk_delay(2000);
 #ifdef WAKEKUP_KEY_NUM
   if (WAKEKUP_KEY_NUM != 0) {
     for (int r = 0; r < MATRIX_ROWS; r++) {
@@ -192,8 +194,5 @@ void sleep_mode_enter(void) {
 #endif
 
 #endif
-
-  before_sleep_mode_enter();
-
   sd_power_system_off();
 }

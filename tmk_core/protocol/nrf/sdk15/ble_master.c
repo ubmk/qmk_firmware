@@ -990,6 +990,26 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
   peer_connected_event();
 }
 
+// Type holding the two output power options for this application.
+typedef enum
+{
+    SELECTION__20_dBm = -20,
+    SELECTION_0_dBm = 0,
+    SELECTION_4_dBm = 4,
+    SELECTION_8_dBm = 8
+} output_power_seclection_t;
+
+static output_power_seclection_t    m_output_power_selected  = SELECTION_8_dBm;          /**< Global variable holding the current output power selection. */
+
+/*
+#define 	BLE_GAP_PHY_AUTO   0x00
+#define 	BLE_GAP_PHY_1MBPS   0x01
+#define 	BLE_GAP_PHY_2MBPS   0x02
+#define 	BLE_GAP_PHY_CODED   0x04
+*/
+static uint32_t phy_config_primary = BLE_GAP_PHY_AUTO;
+// static uint32_t phy_config_secondary = BLE_GAP_PHY_AUTO;
+
 /**@brief Function for handling BLE events.
  *
  * @param[in]   p_ble_evt   Bluetooth stack event.
@@ -1003,6 +1023,10 @@ static void on_ble_peripheral_evt(ble_evt_t const * p_ble_evt) {
   case BLE_GAP_EVT_CONNECTED:
     NRF_LOG_DEBUG("Connected");
     m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+
+    err_code = sd_ble_gap_tx_power_set(BLE_GAP_TX_POWER_ROLE_CONN, m_conn_handle, m_output_power_selected);
+    APP_ERROR_CHECK(err_code);
+
     err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
     APP_ERROR_CHECK(err_code);
 
@@ -1019,6 +1043,8 @@ static void on_ble_peripheral_evt(ble_evt_t const * p_ble_evt) {
     options.ble_adv_slow_enabled = true;
     options.ble_adv_slow_interval = APP_ADV_SLOW_INTERVAL;
     options.ble_adv_slow_timeout = APP_ADV_SLOW_DURATION;
+    // options.ble_adv_primary_phy = phy_config_primary;
+    // options.ble_adv_secondary_phy = phy_config_secondary;
     ble_advertising_modes_config_set(&m_advertising, &options);
     break;
 
@@ -1035,8 +1061,10 @@ static void on_ble_peripheral_evt(ble_evt_t const * p_ble_evt) {
 
   case BLE_GAP_EVT_PHY_UPDATE_REQUEST: {
     NRF_LOG_DEBUG("PHY update request.");
-    ble_gap_phys_t const phys = { .rx_phys = BLE_GAP_PHY_AUTO, .tx_phys =
-        BLE_GAP_PHY_AUTO, };
+    ble_gap_phys_t const phys = { 
+      .rx_phys = phy_config_primary,
+      .tx_phys = phy_config_primary
+    };
     err_code = sd_ble_gap_phy_update(p_ble_evt->evt.gap_evt.conn_handle, &phys);
     APP_ERROR_CHECK(err_code);
   }
@@ -1176,6 +1204,8 @@ void advertising_init(void) {
   init.config.ble_adv_slow_enabled = true;
   init.config.ble_adv_slow_interval = APP_ADV_SLOW_INTERVAL;
   init.config.ble_adv_slow_timeout = APP_ADV_SLOW_DURATION;
+  // init.config.ble_adv_primary_phy = phy_config_primary;
+  // init.config.ble_adv_secondary_phy = phy_config_secondary;
 
   init.evt_handler = on_adv_evt;
   init.error_handler = ble_advertising_error_handler;
@@ -1373,6 +1403,8 @@ void restart_advertising_wo_whitelist() {
   options.ble_adv_slow_enabled = true;
   options.ble_adv_slow_interval = APP_ADV_SLOW_INTERVAL;
   options.ble_adv_slow_timeout = APP_ADV_SLOW_DURATION;
+  // options.ble_adv_primary_phy = phy_config_primary;
+  // options.ble_adv_secondary_phy = phy_config_secondary;
   ble_advertising_modes_config_set(&m_advertising, &options);
 
   if (m_conn_handle != BLE_CONN_HANDLE_INVALID) {
@@ -1416,6 +1448,8 @@ void restart_advertising_id(uint8_t id) {
     options.ble_adv_slow_enabled = true;
     options.ble_adv_slow_interval = APP_ADV_SLOW_INTERVAL;
     options.ble_adv_slow_timeout = APP_ADV_SLOW_DURATION;
+    // options.ble_adv_primary_phy = phy_config_primary;
+    // options.ble_adv_secondary_phy = phy_config_secondary;
     ble_advertising_modes_config_set(&m_advertising, &options);
 
     ret = sd_ble_gap_disconnect(m_conn_handle,
