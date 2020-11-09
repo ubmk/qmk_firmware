@@ -6,24 +6,12 @@
 #endif
 #define KEYBOARD_NAME We65
 
-#ifdef SLEEP_DELAY
-#undef SLEEP_DELAY
-#endif
 #define SLEEP_DELAY 600
 
-#ifdef WAKEKUP_KEY_NUM
-#undef WAKEKUP_KEY_NUM
-#endif
 #define WAKEKUP_KEY_NUM 2
 
-#ifdef HID_BLE_SPEED
-#undef HID_BLE_SPEED
-#endif
-#define HID_BLE_SPEED 6
+#define HID_BLE_SPEED 2
 
-#ifdef TX_POWER
-#undef TX_POWER
-#endif
 #define TX_POWER 0
 
 #endif // CONFIG_KEYMAP_H

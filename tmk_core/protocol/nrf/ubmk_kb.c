@@ -6,6 +6,10 @@
 #include "ubmk.h"
 #include "ubmk_kb.h"
 
+#ifndef SLEEP_DELAY
+#define SLEEP_DELAY          600
+#endif
+
 #define BAT_INDICATOR_ON (defined(LED_PIN0) || defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3))
 #define DEVICE_INDICATOR_ON defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
 #define INDICATOR_TIMEOUT(startAt) (timer_elapsed32(startAt) > 6000)

@@ -108,15 +108,52 @@
 #define APP_ADV_SLOW_DURATION               18000                                      /**< The advertising duration of slow advertising in units of 10 milliseconds. */
 
 /*lint -emacro(524, MIN_CONN_INTERVAL) // Loss of precision */
-#ifndef BLE_HID_MIN_INTERVAL
+
+#ifndef MAX_DEVICE
+#define MAX_DEVICE           3
+#endif
+
+#ifndef TX_POWER
+#define TX_POWER 0
+#endif
+
+#ifdef HID_BLE_SPEED
+
+  #if (HID_BLE_SPEED == 1)
+    #define MATRIX_SCAN_MS 12
+    #define BLE_HID_MIN_INTERVAL 24
+    #define BLE_HID_MAX_INTERVAL 94
+    #define BLE_HID_SLAVE_LATENCY 3
+  #elif (HID_BLE_SPEED == 2)
+    #define MATRIX_SCAN_MS 12
+    #define BLE_HID_MIN_INTERVAL 24
+    #define BLE_HID_MAX_INTERVAL 78
+    #define BLE_HID_SLAVE_LATENCY 3
+  #elif (HID_BLE_SPEED == 3)
+    #define MATRIX_SCAN_MS 12
+    #define BLE_HID_MIN_INTERVAL 24
+    #define BLE_HID_MAX_INTERVAL 62
+    #define BLE_HID_SLAVE_LATENCY 3
+  #elif (HID_BLE_SPEED == 4)
+    #define MATRIX_SCAN_MS 12
+    #define BLE_HID_MIN_INTERVAL 18
+    #define BLE_HID_MAX_INTERVAL 46
+    #define BLE_HID_SLAVE_LATENCY 4
+  #else
+    #error "HID_BLE_SPEED invalid!"
+  #endif
+
+  #define BLE_NUS_MIN_INTERVAL 30
+  #define BLE_NUS_MAX_INTERVAL 50
+#else
+
+  #define MATRIX_SCAN_MS 16
   #define BLE_HID_MIN_INTERVAL 30
-#endif
-#ifndef BLE_HID_MAX_INTERVAL
   #define BLE_HID_MAX_INTERVAL 90
-#endif
-#ifndef BLE_HID_SLAVE_LATENCY
   #define BLE_HID_SLAVE_LATENCY 4
+
 #endif
+
 //#ifndef BLE_HID_TIMEOUT
 //  #define BLE_HID_TIMEOUT 1000
 //#endif
@@ -989,10 +1026,6 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
 
   peer_connected_event();
 }
-
-#ifndef TX_POWER
-#define TX_POWER 0
-#endif
 
 static int8_t m_output_power_selected = TX_POWER;
 

@@ -20,6 +20,10 @@
 #include "ubmk.h"
 #endif
 
+#ifndef WAKEKUP_KEY_NUM
+#define WAKEKUP_KEY_NUM 2
+#endif
+
 __attribute__ ((weak))
 void before_sleep_mode_enter(void) {}
 
