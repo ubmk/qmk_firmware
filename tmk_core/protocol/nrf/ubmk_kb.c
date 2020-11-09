@@ -5,6 +5,7 @@
 #include "usbd.h"
 #include "ubmk.h"
 #include "ubmk_kb.h"
+#include <math.h>
 
 #ifndef SLEEP_DELAY
 #define SLEEP_DELAY          600
@@ -17,6 +18,10 @@
 #define HAS_USD_CONNECTED (nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_CONNECTED || nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_READY)
 void ubmk_sleep_mode_validate(void);
 void ubmk_force_bootloader(void);
+void ubmk_indicator_start(void);
+
+static uint8_t __indicatorChecked = 0;
+static uint32_t __indicatorCheckedTimer = 0;
 
 static bool usbConnected = false;
 
@@ -46,40 +51,59 @@ void ubmk_init() {
     ubmk_pinMode(LED_PIN3, OUTPUT);
     #endif
 
-    #ifdef LED_PIN0
-    ubmk_pinSet(LED_PIN0);
-    ubmk_delay(50);
-    #endif
-    #ifdef LED_PIN1
-    ubmk_pinSet(LED_PIN1);
-    ubmk_delay(50);
-    #endif
-    #ifdef LED_PIN2
-    ubmk_pinSet(LED_PIN2);
-    ubmk_delay(50);
-    #endif
-    #ifdef LED_PIN3
-    ubmk_pinSet(LED_PIN3);
-    ubmk_delay(50);
-    #endif
-
-    #ifdef LED_PIN0
-    ubmk_pinClear(LED_PIN0);
-    #endif
-    #ifdef LED_PIN0
-    ubmk_pinClear(LED_PIN1);
-    #endif
-    #ifdef LED_PIN0
-    ubmk_pinClear(LED_PIN2);
-    #endif
-    #ifdef LED_PIN0
-    ubmk_pinClear(LED_PIN3);
-    #endif
-
     ubmk_force_bootloader();
 }
 
+void ubmk_indicator_start(void) {
+    if (__indicatorChecked > 5) {
+        return;
+    }
+
+    if (__indicatorChecked != 0 && timer_elapsed32(__indicatorCheckedTimer) < 100) {
+        return;
+    }
+    __indicatorChecked += 1;
+    __indicatorCheckedTimer = timer_read32();
+
+    #ifdef LED_PIN0
+    if (__indicatorChecked == 1) {
+        ubmk_pinSet(LED_PIN0);
+    }
+    #endif
+    #ifdef LED_PIN1
+    if (__indicatorChecked == 2) {
+        ubmk_pinSet(LED_PIN1);
+    }
+    #endif
+    #ifdef LED_PIN2
+    if (__indicatorChecked == 3) {
+        ubmk_pinSet(LED_PIN2);
+    }
+    #endif
+    #ifdef LED_PIN3
+    if (__indicatorChecked == 4) {
+        ubmk_pinSet(LED_PIN3);
+    }
+    #endif
+
+    if (__indicatorChecked == 5) {
+        #ifdef LED_PIN0
+        ubmk_pinClear(LED_PIN0);
+        #endif
+        #ifdef LED_PIN1
+        ubmk_pinClear(LED_PIN1);
+        #endif
+        #ifdef LED_PIN2
+        ubmk_pinClear(LED_PIN2);
+        #endif
+        #ifdef LED_PIN3
+        ubmk_pinClear(LED_PIN3);
+        #endif
+    }
+}
+
 void ubmk_scan(void) {
+    ubmk_indicator_start();
 #if BAT_INDICATOR_ON
     if (__batIndicator > 0) {
         if (INDICATOR_TIMEOUT(__batIndicator)) {

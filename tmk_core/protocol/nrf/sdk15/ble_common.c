@@ -140,7 +140,7 @@ void sleep_mode_enter(void) {
   for (int c = 0; c < MATRIX_COLS; c++) {
     ubmk_pinMode(col_pins[c], DISABLE);
   }
-  ubmk_delay(2000);
+  ubmk_delay(1000);
 #ifdef WAKEKUP_KEY_NUM
   if (WAKEKUP_KEY_NUM != 0) {
     for (int r = 0; r < MATRIX_ROWS; r++) {
