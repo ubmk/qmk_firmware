@@ -990,16 +990,11 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
   peer_connected_event();
 }
 
-// Type holding the two output power options for this application.
-typedef enum
-{
-    SELECTION__20_dBm = -20,
-    SELECTION_0_dBm = 0,
-    SELECTION_4_dBm = 4,
-    SELECTION_8_dBm = 8
-} output_power_seclection_t;
+#ifndef TX_POWER
+#define TX_POWER 0
+#endif
 
-static output_power_seclection_t    m_output_power_selected  = SELECTION_8_dBm;          /**< Global variable holding the current output power selection. */
+static int8_t m_output_power_selected = TX_POWER;
 
 /*
 #define 	BLE_GAP_PHY_AUTO   0x00

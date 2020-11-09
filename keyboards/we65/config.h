@@ -10,6 +10,8 @@
 // Tốc độ phản hồi BLE của phím, giá trị từ 1 -> 5, càng cao tốc độ càng nhanh, thời lượng sử dụng pin càng giảm
 #define HID_BLE_SPEED       5
 
+#define TX_POWER            0
+
 #include "system.h"
 
 #endif

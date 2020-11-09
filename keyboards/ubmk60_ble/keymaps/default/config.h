@@ -21,4 +21,9 @@
 #endif
 #define HID_BLE_SPEED 6
 
+#ifdef TX_POWER
+#undef TX_POWER
+#endif
+#define TX_POWER 0
+
 #endif // CONFIG_KEYMAP_H
