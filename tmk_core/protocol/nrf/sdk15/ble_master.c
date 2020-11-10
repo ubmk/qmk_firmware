@@ -109,12 +109,50 @@
 
 /*lint -emacro(524, MIN_CONN_INTERVAL) // Loss of precision */
 
+#define memclr(buffer, size)  memset(buffer, 0, size)
+#define varclr(_var)          memclr(_var, sizeof(*(_var)))
+#define arrclr(_arr)          memclr(_arr, sizeof(_arr[0]) * arrcount(_arr)) // adds type-safety
+
 #ifndef MAX_DEVICE
-#define MAX_DEVICE           3
+#define MAX_DEVICE 3
 #endif
 
 #ifndef TX_POWER
 #define TX_POWER 0
+#endif
+
+#ifdef BLE_BANDWIDTH
+  #if (BLE_BANDWIDTH == 0)
+    #define BLE_CFG_GATT_ATT_MTU 23
+    #define BLE_CFG_EVENT_LENGTH 2
+    #define BLE_CFG_HVN_TX_QUEUE_SIZE 1
+    #define BLE_CFG_WRITE_CMD_TX_QUEUE_SIZE 1
+  #elif (BLE_BANDWIDTH == 1)
+    #define BLE_CFG_GATT_ATT_MTU 23
+    #define BLE_CFG_EVENT_LENGTH 3
+    #define BLE_CFG_HVN_TX_QUEUE_SIZE 1
+    #define BLE_CFG_WRITE_CMD_TX_QUEUE_SIZE 1
+  #elif (BLE_BANDWIDTH == 2)
+    #define BLE_CFG_GATT_ATT_MTU 128
+    #define BLE_CFG_EVENT_LENGTH 6
+    #define BLE_CFG_HVN_TX_QUEUE_SIZE 2
+    #define BLE_CFG_WRITE_CMD_TX_QUEUE_SIZE 1
+  #elif (BLE_BANDWIDTH == 3)
+    #define BLE_CFG_GATT_ATT_MTU 247
+    #define BLE_CFG_EVENT_LENGTH 100
+    #define BLE_CFG_HVN_TX_QUEUE_SIZE 3
+    #define BLE_CFG_WRITE_CMD_TX_QUEUE_SIZE 1
+  #else
+    #define BLE_CFG_GATT_ATT_MTU 23
+    #define BLE_CFG_EVENT_LENGTH 3
+    #define BLE_CFG_HVN_TX_QUEUE_SIZE 1
+    #define BLE_CFG_WRITE_CMD_TX_QUEUE_SIZE 1
+  #endif
+#else
+    #define BLE_CFG_GATT_ATT_MTU 23
+    #define BLE_CFG_EVENT_LENGTH 3
+    #define BLE_CFG_HVN_TX_QUEUE_SIZE 1
+    #define BLE_CFG_WRITE_CMD_TX_QUEUE_SIZE 1
 #endif
 
 #ifdef HID_BLE_SPEED
@@ -140,11 +178,12 @@
     #define BLE_HID_MAX_INTERVAL 46
     #define BLE_HID_SLAVE_LATENCY 4
   #else
-    #error "HID_BLE_SPEED invalid!"
+    #define MATRIX_SCAN_MS 12
+    #define BLE_HID_MIN_INTERVAL 24
+    #define BLE_HID_MAX_INTERVAL 78
+    #define BLE_HID_SLAVE_LATENCY 3
   #endif
 
-  #define BLE_NUS_MIN_INTERVAL 30
-  #define BLE_NUS_MAX_INTERVAL 50
 #else
 
   #define MATRIX_SCAN_MS 16
@@ -153,6 +192,9 @@
   #define BLE_HID_SLAVE_LATENCY 4
 
 #endif
+
+#define BLE_NUS_MIN_INTERVAL 30
+#define BLE_NUS_MAX_INTERVAL 50
 
 //#ifndef BLE_HID_TIMEOUT
 //  #define BLE_HID_TIMEOUT 1000
@@ -573,9 +615,15 @@ static void gatt_init(void) {
   ret_code_t err_code = nrf_ble_gatt_init(&m_gatt, gatt_evt_handler);
   APP_ERROR_CHECK(err_code);
 
-  err_code = nrf_ble_gatt_att_mtu_central_set(&m_gatt,
-      NRF_SDH_BLE_GATT_MAX_MTU_SIZE);
+  err_code = nrf_ble_gatt_att_mtu_central_set(&m_gatt, BLE_CFG_GATT_ATT_MTU);
   APP_ERROR_CHECK(err_code);
+
+  err_code = nrf_ble_gatt_att_mtu_periph_set(&m_gatt, BLE_CFG_GATT_ATT_MTU);
+  APP_ERROR_CHECK(err_code);
+  /*
+  err_code = nrf_ble_gatt_data_length_set(&m_gatt, BLE_CONN_HANDLE_INVALID, BLE_CFG_EVENT_LENGTH);
+  APP_ERROR_CHECK(err_code);
+  */
 }
 
 /**@brief Function for the GAP initialization.
@@ -1163,8 +1211,44 @@ void ble_stack_init(void) {
   err_code = nrf_sdh_ble_default_cfg_set(APP_BLE_CONN_CFG_TAG, &ram_start);
   APP_ERROR_CHECK(err_code);
 
+  ble_cfg_t blecfg;
+  // ATT MTU
+  varclr(&blecfg);
+  blecfg.conn_cfg.conn_cfg_tag = APP_BLE_CONN_CFG_TAG;
+  blecfg.conn_cfg.params.gatt_conn_cfg.att_mtu = BLE_CFG_GATT_ATT_MTU;
+  err_code = sd_ble_cfg_set(BLE_CONN_CFG_GATT, &blecfg, ram_start);
+  APP_ERROR_CHECK(err_code);
+
+  // Event length and max connection for this config
+  varclr(&blecfg);
+  blecfg.conn_cfg.conn_cfg_tag = APP_BLE_CONN_CFG_TAG;
+  blecfg.conn_cfg.params.gap_conn_cfg.conn_count   = MAX_DEVICE;
+  blecfg.conn_cfg.params.gap_conn_cfg.event_length = BLE_CFG_EVENT_LENGTH;
+  err_code = sd_ble_cfg_set(BLE_CONN_CFG_GAP, &blecfg, ram_start);
+  APP_ERROR_CHECK(err_code);
+
+  // HVN queue size
+  varclr(&blecfg);
+  blecfg.conn_cfg.conn_cfg_tag = APP_BLE_CONN_CFG_TAG;
+  blecfg.conn_cfg.params.gatts_conn_cfg.hvn_tx_queue_size = BLE_CFG_HVN_TX_QUEUE_SIZE;
+  err_code = sd_ble_cfg_set(BLE_CONN_CFG_GATTS, &blecfg, ram_start);
+  APP_ERROR_CHECK(err_code);
+
+  // WRITE COMMAND queue size
+  varclr(&blecfg);
+  blecfg.conn_cfg.conn_cfg_tag = APP_BLE_CONN_CFG_TAG;
+  blecfg.conn_cfg.params.gattc_conn_cfg.write_cmd_tx_queue_size = BLE_CFG_WRITE_CMD_TX_QUEUE_SIZE;
+  err_code = sd_ble_cfg_set(BLE_CONN_CFG_GATTC, &blecfg, ram_start);
+  APP_ERROR_CHECK(err_code);
+
   // Enable BLE stack.
   err_code = nrf_sdh_ble_enable(&ram_start);
+  APP_ERROR_CHECK(err_code);
+
+  ble_opt_t  opt;
+  varclr(&opt);
+  opt.common_opt.conn_evt_ext.enable = 1; // enable Data Length Extension
+  err_code = sd_ble_opt_set(BLE_COMMON_OPT_CONN_EVT_EXT, &opt);
   APP_ERROR_CHECK(err_code);
 
   // Register a handler for BLE events.

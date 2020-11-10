@@ -4,14 +4,16 @@
 #ifdef KEYBOARD_NAME
 #undef KEYBOARD_NAME
 #endif
-#define KEYBOARD_NAME Ubmk60
+#define KEYBOARD_NAME ViS0
 
 #define SLEEP_DELAY 600
 
 #define WAKEKUP_KEY_NUM 2
 
+#define BLE_BANDWIDTH 1
+
 #define HID_BLE_SPEED 2
 
-#define TX_POWER 0
+#define TX_POWER 4
 
 #endif // CONFIG_KEYMAP_H

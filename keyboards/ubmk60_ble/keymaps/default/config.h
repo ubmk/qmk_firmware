@@ -10,8 +10,10 @@
 
 #define WAKEKUP_KEY_NUM 2
 
+#define BLE_BANDWIDTH 1
+
 #define HID_BLE_SPEED 2
 
-#define TX_POWER 0
+#define TX_POWER 4
 
 #endif // CONFIG_KEYMAP_H
