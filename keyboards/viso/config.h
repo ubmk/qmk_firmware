@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 // Tên bàn phím
-#define KEYBOARD_NAME Ubmk60
+#define KEYBOARD_NAME ViS0
 
 #include "system.h"
 

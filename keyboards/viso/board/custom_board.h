@@ -18,7 +18,7 @@ extern "C" {
     #define PIN12   GPIO(0,28)     // 12 - P0.28 (row5)
     #define PIN16   GPIO(1,13)     // 16 - P1.13 (col0)
     #define PIN17   GPIO(0,13)     // 17 - P0.13 (col1)
-    #define PIN18   GPIO(0,9)      // 18 - P1.09 (col2)
+    #define PIN18   GPIO(1,9)      // 18 - P1.09 (col2)
     #define PIN19   GPIO(0,31)     // 19 - P0.31 (col3)
     #define PIN27   GPIO(0,9)      // 27 - P0.09 (NFC1)
     #define PIN28   GPIO(0,10)     // 28 - P0.10 (NRF2)
