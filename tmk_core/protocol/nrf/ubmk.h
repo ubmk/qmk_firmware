@@ -9,6 +9,7 @@ typedef enum {
     INPUT_PULLDOWN = (0x3),
     INPUT_PULLUP_SENSE = (0x4),
     INPUT_PULLDOWN_SENSE = (0x5),
+    KB_OUTPUT = (0x6),
     DISABLE = (0x9)
 } pin_mode_t;
 

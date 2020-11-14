@@ -3,9 +3,6 @@
 #include "nrf_gpio.h"
 #include "nrf_delay.h"
 
-const uint32_t gpio_drive = (uint32_t)GPIO_PIN_CNF_DRIVE_S0S1;
-// const uint32_t gpio_drive = (uint32_t)GPIO_PIN_CNF_DRIVE_S0D1;
-
 void ubmk_pinMode(uint32_t ulPin, pin_mode_t ulMode) {
   /*
   if (ulPin >= PINS_COUNT) {
@@ -25,7 +22,7 @@ void ubmk_pinMode(uint32_t ulPin, pin_mode_t ulMode) {
       port->PIN_CNF[ulPin] = ((uint32_t)GPIO_PIN_CNF_DIR_Input        << GPIO_PIN_CNF_DIR_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_INPUT_Connect    << GPIO_PIN_CNF_INPUT_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_PULL_Disabled    << GPIO_PIN_CNF_PULL_Pos)
-                           | ((uint32_t)gpio_drive       << GPIO_PIN_CNF_DRIVE_Pos)
+                           | ((uint32_t)GPIO_PIN_CNF_DRIVE_S0S1       << GPIO_PIN_CNF_DRIVE_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_SENSE_Disabled   << GPIO_PIN_CNF_SENSE_Pos);
     break;
 
@@ -34,7 +31,7 @@ void ubmk_pinMode(uint32_t ulPin, pin_mode_t ulMode) {
       port->PIN_CNF[ulPin] = ((uint32_t)GPIO_PIN_CNF_DIR_Input        << GPIO_PIN_CNF_DIR_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_INPUT_Connect    << GPIO_PIN_CNF_INPUT_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_PULL_Pullup      << GPIO_PIN_CNF_PULL_Pos)
-                           | ((uint32_t)gpio_drive       << GPIO_PIN_CNF_DRIVE_Pos)
+                           | ((uint32_t)GPIO_PIN_CNF_DRIVE_S0S1       << GPIO_PIN_CNF_DRIVE_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_SENSE_Disabled   << GPIO_PIN_CNF_SENSE_Pos);
     break;
     
@@ -43,7 +40,7 @@ void ubmk_pinMode(uint32_t ulPin, pin_mode_t ulMode) {
       port->PIN_CNF[ulPin] = ((uint32_t)GPIO_PIN_CNF_DIR_Input        << GPIO_PIN_CNF_DIR_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_INPUT_Connect    << GPIO_PIN_CNF_INPUT_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_PULL_Pullup      << GPIO_PIN_CNF_PULL_Pos)
-                           | ((uint32_t)gpio_drive       << GPIO_PIN_CNF_DRIVE_Pos)
+                           | ((uint32_t)GPIO_PIN_CNF_DRIVE_S0S1       << GPIO_PIN_CNF_DRIVE_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_SENSE_Low        << GPIO_PIN_CNF_SENSE_Pos);
     break;
 
@@ -52,7 +49,7 @@ void ubmk_pinMode(uint32_t ulPin, pin_mode_t ulMode) {
       port->PIN_CNF[ulPin] = ((uint32_t)GPIO_PIN_CNF_DIR_Input        << GPIO_PIN_CNF_DIR_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_INPUT_Connect    << GPIO_PIN_CNF_INPUT_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_PULL_Pulldown    << GPIO_PIN_CNF_PULL_Pos)
-                           | ((uint32_t)gpio_drive       << GPIO_PIN_CNF_DRIVE_Pos)
+                           | ((uint32_t)GPIO_PIN_CNF_DRIVE_S0S1       << GPIO_PIN_CNF_DRIVE_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_SENSE_Disabled   << GPIO_PIN_CNF_SENSE_Pos);
     break;
 
@@ -61,7 +58,7 @@ void ubmk_pinMode(uint32_t ulPin, pin_mode_t ulMode) {
       port->PIN_CNF[ulPin] = ((uint32_t)GPIO_PIN_CNF_DIR_Input        << GPIO_PIN_CNF_DIR_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_INPUT_Connect    << GPIO_PIN_CNF_INPUT_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_PULL_Pulldown    << GPIO_PIN_CNF_PULL_Pos)
-                           | ((uint32_t)gpio_drive       << GPIO_PIN_CNF_DRIVE_Pos)
+                           | ((uint32_t)GPIO_PIN_CNF_DRIVE_S0S1       << GPIO_PIN_CNF_DRIVE_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_SENSE_High       << GPIO_PIN_CNF_SENSE_Pos);
     break;
 
@@ -70,7 +67,16 @@ void ubmk_pinMode(uint32_t ulPin, pin_mode_t ulMode) {
       port->PIN_CNF[ulPin] = ((uint32_t)GPIO_PIN_CNF_DIR_Output       << GPIO_PIN_CNF_DIR_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_PULL_Disabled    << GPIO_PIN_CNF_PULL_Pos)
-                           | ((uint32_t)gpio_drive       << GPIO_PIN_CNF_DRIVE_Pos)
+                           | ((uint32_t)NRF_GPIO_PIN_S0D1       << GPIO_PIN_CNF_DRIVE_Pos)
+                           | ((uint32_t)GPIO_PIN_CNF_SENSE_Disabled   << GPIO_PIN_CNF_SENSE_Pos);
+    break;
+
+    case KB_OUTPUT:
+      // Set pin to output mode
+      port->PIN_CNF[ulPin] = ((uint32_t)GPIO_PIN_CNF_DIR_Output       << GPIO_PIN_CNF_DIR_Pos)
+                           | ((uint32_t)GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos)
+                           | ((uint32_t)GPIO_PIN_CNF_PULL_Disabled    << GPIO_PIN_CNF_PULL_Pos)
+                           | ((uint32_t)GPIO_PIN_CNF_DRIVE_S0S1       << GPIO_PIN_CNF_DRIVE_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_SENSE_Disabled   << GPIO_PIN_CNF_SENSE_Pos);
     break;
 
@@ -79,7 +85,7 @@ void ubmk_pinMode(uint32_t ulPin, pin_mode_t ulMode) {
       port->PIN_CNF[ulPin] = ((uint32_t)GPIO_PIN_CNF_DIR_Input       << GPIO_PIN_CNF_DIR_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_PULL_Disabled    << GPIO_PIN_CNF_PULL_Pos)
-                           | ((uint32_t)gpio_drive       << GPIO_PIN_CNF_DRIVE_Pos)
+                           | ((uint32_t)GPIO_PIN_CNF_DRIVE_S0S1       << GPIO_PIN_CNF_DRIVE_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_SENSE_Disabled   << GPIO_PIN_CNF_SENSE_Pos);
 
     default:

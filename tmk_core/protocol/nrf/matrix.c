@@ -463,7 +463,7 @@ static void init_rows() {
 #else
   for(int i=0; i<THIS_DEVICE_ROWS; i++) {
     #ifdef UBMK
-    ubmk_pinMode(row_pins[i], OUTPUT);
+    ubmk_pinMode(row_pins[i], KB_OUTPUT);
     #else // Not UBMK
     nrf_gpio_cfg(row_pins[i],
         NRF_GPIO_PIN_DIR_OUTPUT,
@@ -482,7 +482,7 @@ static void  init_cols(void)
 #if DIODE_DIRECTION == ROW2COL
   for(int i=0; i<THIS_DEVICE_COLS; i++) {
     #ifdef UBMK
-    ubmk_pinMode(col_pins[i], OUTPUT);
+    ubmk_pinMode(col_pins[i], KB_OUTPUT);
     #else // Not UBMK
     nrf_gpio_cfg(col_pins[i],
         NRF_GPIO_PIN_DIR_OUTPUT,
