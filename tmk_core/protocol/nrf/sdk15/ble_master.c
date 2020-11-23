@@ -176,7 +176,7 @@
     #define MATRIX_SCAN_MS 12
     #define BLE_HID_MIN_INTERVAL 18
     #define BLE_HID_MAX_INTERVAL 46
-    #define BLE_HID_SLAVE_LATENCY 4
+    #define BLE_HID_SLAVE_LATENCY 3
   #else
     #define MATRIX_SCAN_MS 12
     #define BLE_HID_MIN_INTERVAL 24
