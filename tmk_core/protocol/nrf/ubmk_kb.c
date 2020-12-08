@@ -7,6 +7,13 @@
 #include "ubmk_kb.h"
 #include <math.h>
 
+#ifdef RGBLIGHT_ENABLE
+#include "rgblight.h"
+//Following line allows macro to read current RGB settings
+int RGB_current_mode = 0;
+extern rgblight_config_t rgblight_config;
+#endif
+
 #ifndef SLEEP_DELAY
 #define SLEEP_DELAY          600
 #endif
@@ -49,6 +56,22 @@ void ubmk_init() {
     #endif
     #ifdef LED_PIN3
     ubmk_pinMode(LED_PIN3, OUTPUT);
+    #endif
+
+    #ifdef PIN_CHARGE_CTRL
+    ubmk_pinMode(PIN_CHARGE_CTRL, OUTPUT);
+    ubmk_pinClear(PIN_CHARGE_CTRL);
+    #endif
+
+    #ifdef RGBLIGHT_ENABLE
+        #ifdef PIN_RGB_CTRL
+        ubmk_pinMode(PIN_RGB_CTRL, OUTPUT);
+        if (rgblight_config.enable) {
+            ubmk_pinClear(PIN_RGB_CTRL);
+        } else {
+            ubmk_pinSet(PIN_RGB_CTRL);
+        }
+        #endif
     #endif
 
     ubmk_force_bootloader();
@@ -270,6 +293,60 @@ bool ubmk_process_record(uint16_t keycode, keyrecord_t *record) {
                 break;
             case ENT_DFU:
                 bootloader_jump();
+                result = false;
+                break;
+            /*
+            case RGB_MOD:
+                #ifdef RGBLIGHT_ENABLE
+                // rgblight_mode(RGB_current_mode);
+                rgblight_step();
+                RGB_current_mode = rgblight_config.mode;
+                #endif
+                result = false;
+                break;
+            case RGB_RMOD:
+                #ifdef RGBLIGHT_ENABLE
+                // rgblight_mode(RGB_current_mode);
+                rgblight_step_reverse();
+                RGB_current_mode = rgblight_config.mode;
+                #endif
+                result = false;
+                break;
+            */
+            case RGB_TOG:
+                #ifdef RGBLIGHT_ENABLE
+                if (RGB_current_mode == 0) {
+                    #ifdef PIN_RGB_CTRL
+                    ubmk_pinClear(PIN_RGB_CTRL);
+                    #endif
+                    eeconfig_update_rgblight_default();
+                    RGB_current_mode = rgblight_config.mode;
+                    rgblight_enable();
+                } else {
+                    if (rgblight_config.enable) {
+                        rgblight_disable();
+                        #ifdef PIN_RGB_CTRL
+                        ubmk_pinSet(PIN_RGB_CTRL);
+                        #endif
+                    } else {
+                        rgblight_enable();
+                        #ifdef PIN_RGB_CTRL
+                        ubmk_pinClear(PIN_RGB_CTRL);
+                        #endif
+                    }
+                }
+                #endif
+                result = false;
+                break;
+            case RGBRST:
+                #ifdef RGBLIGHT_ENABLE
+                    #ifdef PIN_RGB_CTRL
+                    ubmk_pinClear(PIN_RGB_CTRL);
+                    #endif
+                eeconfig_update_rgblight_default();
+                rgblight_enable();
+                RGB_current_mode = rgblight_config.mode;
+                #endif
                 result = false;
                 break;
             default:

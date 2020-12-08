@@ -20,7 +20,8 @@ enum ubmk_custom_keycodes {
     DEL_ID2,              /* Delete bonding of PeerID 2           */
     ENT_DFU,              /* Start bootloader                     */
     ENT_SLP,              /* Deep sleep mode                      */
-    DEVICE_ID             /* Show current device index by LED indicator */
+    DEVICE_ID,             /* Show current device index by LED indicator */
+    RGBRST
 };
 
 void ubmk_init(void);

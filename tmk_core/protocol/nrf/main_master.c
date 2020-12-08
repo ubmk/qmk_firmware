@@ -96,7 +96,7 @@ void console_task(void);
 rgblight_syncinfo_t rgblight_sync;
 #endif
 
-uint32_t ble_nus_send_bytes_to_slave(uint8_t* buf, uint16_t len);
+// uint32_t ble_nus_send_bytes_to_slave(uint8_t* buf, uint16_t len);
 
 void eeprom_update(void);
 void timer_tick(uint8_t interval);
@@ -120,7 +120,7 @@ void main_tasks(void* p_context) {
 
   if (rgblight_get_change_flags()) {
     rgblight_get_syncinfo(&rgblight_sync);
-    ble_nus_send_bytes_to_slave((uint8_t*)&rgblight_sync, sizeof(rgblight_sync));
+    // ble_nus_send_bytes_to_slave((uint8_t*)&rgblight_sync, sizeof(rgblight_sync));
     rgblight_clear_change_flags();
   }
 
@@ -263,7 +263,6 @@ int main(void) {
 #ifdef VISUALIZER_ENABLE
   visualizer_init();
 #endif
-
 
   host_driver_t* driver = NULL;
   driver = &nrf_ble_driver;

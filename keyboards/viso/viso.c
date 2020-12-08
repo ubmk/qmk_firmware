@@ -2,14 +2,23 @@
 #include "quantum.h"
 #include "ubmk.h"
 #include "ubmk_kb.h"
+#ifdef ENCODER_ENABLE
+  #include "encoder.h"
+#endif
 
 void matrix_init_kb() {
     ubmk_init();
+    #ifdef ENCODER_ENABLE
+        encoder_init();
+    #endif
     matrix_init_user();
 }
 
 void matrix_scan_kb(void) {
     ubmk_scan();
+    #ifdef ENCODER_ENABLE
+        encoder_read();
+    #endif
     matrix_scan_user();
 }
 
