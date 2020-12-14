@@ -8,18 +8,18 @@
 
 void matrix_init_kb() {
     ubmk_init();
+    matrix_init_user();
     #ifdef ENCODER_ENABLE
         encoder_init();
     #endif
-    matrix_init_user();
 }
 
 void matrix_scan_kb(void) {
     ubmk_scan();
+    matrix_scan_user();
     #ifdef ENCODER_ENABLE
         encoder_read();
     #endif
-    matrix_scan_user();
 }
 
 bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
