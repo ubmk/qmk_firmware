@@ -57,6 +57,7 @@ endif
 ifeq ($(UBMK),yes)
   SRC += $(NRF_DIR)/ubmk.c
   SRC += $(NRF_DIR)/ubmk_kb.c
+  SRC += $(NRF_DIR)/ubmk_encoder.c
 endif
 
 VPATH += $(TMK_PATH)/$(PROTOCOL_DIR)

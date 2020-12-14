@@ -9,7 +9,6 @@ SLEEP_LED_ENABLE = no  # Breathing sleep LED during USB suspend
 NKRO_ENABLE = no	    # USB Nkey Rollover
 CUSTOM_MATRIX = yes # This flag should be on for nrf52
 RGBLIGHT_ENABLE = yes
-SRC += encoder.c
 
 NO_USB_STARTUP_CHECK = yes
 

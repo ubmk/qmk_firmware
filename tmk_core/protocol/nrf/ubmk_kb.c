@@ -14,6 +14,10 @@ int RGB_current_mode = 0;
 extern rgblight_config_t rgblight_config;
 #endif
 
+#ifdef ENCODER_ENABLE
+    #include "ubmk_encoder.h"
+#endif
+
 #ifndef SLEEP_DELAY
 #define SLEEP_DELAY          600
 #endif
@@ -72,6 +76,10 @@ void ubmk_init() {
             ubmk_pinSet(PIN_RGB_CTRL);
         }
         #endif
+    #endif
+
+    #ifdef ENCODER_ENABLE
+        encoder_init();
     #endif
 
     ubmk_force_bootloader();
@@ -150,6 +158,15 @@ void ubmk_scan(void) {
 
     ubmk_force_bootloader();
     ubmk_sleep_mode_validate();
+
+#ifdef ENCODER_ENABLE
+    uint16_t currentRotaryState = get_current_rotaryState();
+    if (currentRotaryState != 0) {
+        unregister_code(currentRotaryState);
+        clear_rotaryState();
+    }
+    encoder_read();
+#endif
 
     /*
   #ifdef VDIV_PIN

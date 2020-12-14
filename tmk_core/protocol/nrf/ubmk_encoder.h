@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#ifndef UBMK_ENCODER_H_
+#define UBMK_ENCODER_H_
 
 #include "quantum.h"
 
@@ -24,3 +25,8 @@ void encoder_read(void);
 
 void encoder_update_kb(int8_t index, bool clockwise);
 void encoder_update_user(int8_t index, bool clockwise);
+
+uint16_t get_current_rotaryState();
+void clear_rotaryState();
+
+#endif //UBMK_ENCODER_H_

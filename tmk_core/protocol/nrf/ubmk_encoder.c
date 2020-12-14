@@ -14,10 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifdef ENCODER_ENABLE
+
 #include QMK_KEYBOARD_H
-#include "encoder.h"
+#include "ubmk.h"
+#include "ubmk_encoder.h"
 #include "nrf_gpio.h"
 #include "nrf_delay.h"
+#include "app_ble_func.h"
+#include "quantum.h"
 
 // for memcpy
 #include <string.h>
@@ -39,15 +45,62 @@ static int8_t encoder_LUT[] = {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 1, -1, 
 static uint8_t encoder_state[NUMBER_OF_ENCODERS] = {0};
 static int8_t encoder_value[NUMBER_OF_ENCODERS] = {0};
 
-__attribute__((weak)) void encoder_update_user(int8_t index, bool clockwise) {   
+static uint16_t __rotaryState = 0;
+
+uint8_t get_current_layer();
+uint16_t get_left_keycode();
+uint16_t get_right_keycode();
+
+uint8_t get_current_layer() {
+  uint8_t i;
+  for (i = 0; i < 16; i++) {
+    if (IS_LAYER_ON(i)) {
+      return i;
+    }
+  }
+  return 0;
+}
+
+uint16_t get_left_keycode() {
+  uint8_t currentLayer = get_current_layer();
+  return keymaps[currentLayer][5][1];
+}
+
+uint16_t get_right_keycode() {
+  uint8_t currentLayer = get_current_layer();
+  return keymaps[currentLayer][5][3];
+}
+
+uint16_t get_current_rotaryState() {
+    return __rotaryState;
+}
+
+void clear_rotaryState() {
+    __rotaryState = 0;
+}
+
+__attribute__((weak)) void encoder_update_user(int8_t index, bool clockwise) {
+    uint16_t kc = 0;
+    if (clockwise) {
+        kc = get_right_keycode();
+    } else {
+        kc = get_left_keycode();
+    }
+    if (__rotaryState != 0 && __rotaryState != kc) {
+        unregister_code(__rotaryState);
+    }
+    if (kc != 0) {
+        __rotaryState = kc;
+        register_code(kc);
+    }
 }
 
 __attribute__((weak)) void encoder_update_kb(int8_t index, bool clockwise) { encoder_update_user(index, clockwise); }
 
 void encoder_init(void) {
     for (int i = 0; i < NUMBER_OF_ENCODERS; i++) {
-        nrf_gpio_cfg_input(encoders_pad_a[i],NRF_GPIO_PIN_PULLUP);
-        nrf_gpio_cfg_input(encoders_pad_b[i],NRF_GPIO_PIN_PULLUP);
+        ubmk_pinMode(encoders_pad_a[i], INPUT_PULLUP);
+        ubmk_pinMode(encoders_pad_b[i], INPUT_PULLUP);
 
         encoder_state[i] = (nrf_gpio_pin_read(encoders_pad_a[i]) << 0) | (nrf_gpio_pin_read(encoders_pad_b[i]) << 1);
     }
@@ -71,3 +124,5 @@ void encoder_read(void) {
         encoder_update(i, encoder_state[i]);
     }
 }
+
+#endif // ENCODER_ENABLE

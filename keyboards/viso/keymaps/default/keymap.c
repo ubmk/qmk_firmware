@@ -1,9 +1,6 @@
 #include QMK_KEYBOARD_H
 #include "app_ble_func.h"
 #include "ubmk_kb.h"
-#include "quantum.h"
-#include "timer.h"
-#include "eeprom.h"
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   /* Qwerty
@@ -54,55 +51,3 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 
-#ifdef ENCODER_ENABLE
-
-static uint16_t __rotaryState = 0;
-
-uint8_t get_current_layer();
-uint16_t get_left_keycode();
-uint16_t get_right_keycode();
-
-uint8_t get_current_layer() {
-  uint8_t i;
-  for (i = 0; i < 16; i++) {
-    if (IS_LAYER_ON(i)) {
-      return i;
-    }
-  }
-  return 0;
-}
-
-uint16_t get_left_keycode() {
-  uint8_t currentLayer = get_current_layer();
-  return keymaps[currentLayer][5][1];
-}
-
-uint16_t get_right_keycode() {
-  uint8_t currentLayer = get_current_layer();
-  return keymaps[currentLayer][5][3];
-}
-
-void encoder_update_user(uint8_t index, bool clockwise) {
-  uint16_t kc = 0;
-  if (clockwise) {
-    kc = get_right_keycode();
-  } else {
-    kc = get_left_keycode();
-  }
-  if (__rotaryState != 0 && __rotaryState != kc) {
-    unregister_code(__rotaryState);
-  }
-  if (kc != 0) {
-    __rotaryState = kc;
-    register_code(kc);
-  }
-}
-
-void matrix_scan_user(void) {
-  if (__rotaryState != 0) {
-    unregister_code(__rotaryState);
-    __rotaryState = 0;
-  }
-}
-
-#endif

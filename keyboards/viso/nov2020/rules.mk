@@ -1,3 +1,1 @@
 EXTNRFCFLAGS += -DVISO_NOW2020
-
-SRC += encoder.c

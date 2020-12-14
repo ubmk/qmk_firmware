@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UBMK_H_
+#define UBMK_H_
 #include <stdint.h>
 #include <stddef.h>
 
@@ -29,3 +30,5 @@ float ubmk_analogReadMv(uint32_t ulPin);
 
 void ubmk_delay(uint32_t number_of_ms);
 uint8_t ubmk_mvToPercent(float mvolts);
+
+#endif // UBMK_H_

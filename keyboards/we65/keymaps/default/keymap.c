@@ -1,9 +1,6 @@
 #include QMK_KEYBOARD_H
 #include "app_ble_func.h"
 #include "ubmk_kb.h"
-#include "quantum.h"
-#include "timer.h"
-#include "eeprom.h"
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   /* Qwerty
@@ -67,38 +64,3 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_NO,KC_NO,KC_NO,BATT_LV,KC_NO,KC_NO,KC_NO,KC_NO,KC_NO,KC_NO
     )
 };
-
-#ifdef ENCODER_ENABLE
-
-static uint16_t __rotaryState = 0;
-static uint32_t __rotaryCheckedTimer = 0;
-
-void encoder_update_user(uint8_t index, bool clockwise) {
-  __rotaryCheckedTimer = timer_read32();
-  if (clockwise) {
-    __rotaryState = KC_VOLU;
-    register_code(KC_VOLU);
-    // unregister_code(KC_VOLU);
-  } else {
-    __rotaryState = KC_VOLD;
-    register_code(KC_VOLD);
-    // unregister_code(KC_VOLD);
-  }
-}
-
-void matrix_scan_user(void) {
-  if (__rotaryState != 0) {
-    /*
-    if (timer_elapsed32(__rotaryCheckedTimer) > 100) {
-    }
-    */
-    if (__rotaryState == KC_VOLU) {
-      unregister_code(KC_VOLU);
-    } else if (__rotaryState == KC_VOLD) {
-      unregister_code(KC_VOLD);
-    }
-    __rotaryState = 0;
-  }
-}
-
-#endif

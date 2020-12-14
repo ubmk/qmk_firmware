@@ -1,3 +1,6 @@
+#ifndef UBMK_KB_H_
+#define UBMK_KB_H_
+
 #include "quantum.h"
 
 enum ubmk_custom_keycodes {
@@ -30,3 +33,5 @@ bool ubmk_process_record(uint16_t keycode, keyrecord_t *record);
 void ubmk_led_set(uint8_t usb_led);
 void ubmk_bat_indicator(bool state);
 void ubmk_device_indicator(bool state);
+
+#endif // UBMK_KB_H_
