@@ -1,5 +1,6 @@
 NRF_DEBUG = no
 UBMK = yes
+UBMK_ENCODER = yes
 
 MOUSEKEY_ENABLE = yes	# Mouse keys
 EXTRAKEY_ENABLE = yes	# Audio control and System control

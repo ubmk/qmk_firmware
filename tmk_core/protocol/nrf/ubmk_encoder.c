@@ -15,13 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef ENCODER_ENABLE
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include QMK_KEYBOARD_H
 #include "ubmk.h"
 #include "ubmk_encoder.h"
 #include "nrf_gpio.h"
-#include "nrf_delay.h"
 #include "app_ble_func.h"
 #include "quantum.h"
 
@@ -42,10 +43,13 @@ static uint8_t encoders_pad_b[] = ENCODERS_PAD_B;
 
 static int8_t encoder_LUT[] = {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 1, -1, 0};
 
-static uint8_t encoder_state[NUMBER_OF_ENCODERS] = {0};
-static int8_t encoder_value[NUMBER_OF_ENCODERS] = {0};
+volatile uint8_t encoder_state[NUMBER_OF_ENCODERS] = {0};
+volatile int8_t encoder_value[NUMBER_OF_ENCODERS] = {0};
 
 static uint16_t __rotaryState = 0;
+
+static uint8_t encoder_l[2] = ENCODERS_L;
+static uint8_t encoder_r[2] = ENCODERS_R;
 
 uint8_t get_current_layer();
 uint16_t get_left_keycode();
@@ -63,12 +67,14 @@ uint8_t get_current_layer() {
 
 uint16_t get_left_keycode() {
   uint8_t currentLayer = get_current_layer();
-  return keymaps[currentLayer][5][1];
+  return keymaps[currentLayer][encoder_l[0]][encoder_l[1]];
+  // return KC_VOLD;
 }
 
 uint16_t get_right_keycode() {
   uint8_t currentLayer = get_current_layer();
-  return keymaps[currentLayer][5][3];
+  return keymaps[currentLayer][encoder_r[0]][encoder_l[1]];
+  // return KC_VOLU;
 }
 
 uint16_t get_current_rotaryState() {
@@ -102,7 +108,12 @@ void encoder_init(void) {
         ubmk_pinMode(encoders_pad_a[i], INPUT_PULLUP);
         ubmk_pinMode(encoders_pad_b[i], INPUT_PULLUP);
 
-        encoder_state[i] = (nrf_gpio_pin_read(encoders_pad_a[i]) << 0) | (nrf_gpio_pin_read(encoders_pad_b[i]) << 1);
+        uint32_t av = nrf_gpio_pin_read(encoders_pad_a[i]);
+        uint32_t bv = nrf_gpio_pin_read(encoders_pad_b[i]);
+
+        encoder_state[i] = (av << 0) | (bv << 1);
+        encoder_value[i] = 0;
+        // encoder_state[i] = ubmk_pinRead(encoders_pad_a[i]) | ubmk_pinRead(encoders_pad_b[i]) << 1;
     }
 }
 
@@ -119,10 +130,16 @@ static void encoder_update(int8_t index, uint8_t state) {
 
 void encoder_read(void) {
     for (int i = 0; i < NUMBER_OF_ENCODERS; i++) {
+        uint32_t av = nrf_gpio_pin_read(encoders_pad_a[i]);
+        uint32_t bv = nrf_gpio_pin_read(encoders_pad_b[i]);
+
         encoder_state[i] <<= 2;
-        encoder_state[i] |= (nrf_gpio_pin_read(encoders_pad_a[i]) << 0) | (nrf_gpio_pin_read(encoders_pad_b[i]) << 1);
+        encoder_state[i] |= (av << 0) | (bv << 1);
+        // encoder_state[i] |= ubmk_pinRead(encoders_pad_a[i]) | ubmk_pinRead(encoders_pad_b[i]) << 1;
         encoder_update(i, encoder_state[i]);
     }
 }
 
-#endif // ENCODER_ENABLE
+#ifdef __cplusplus
+}
+#endif

@@ -15,7 +15,11 @@ extern rgblight_config_t rgblight_config;
 #endif
 
 #ifdef ENCODER_ENABLE
+    #ifdef ENCODER_V2
+    #include "ubmk_encoder_v2.h"
+    #else
     #include "ubmk_encoder.h"
+    #endif
 #endif
 
 #ifndef SLEEP_DELAY

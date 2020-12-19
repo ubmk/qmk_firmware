@@ -46,18 +46,6 @@
 
 #define PROGMEM // arm-gcc does not interpret PROGMEM
 
-#define RGB_DI_PIN PIN_RGB
-#define RGBLIGHT_ANIMATIONS
-#define RGBLED_NUM 16
-#define RGBLIGHT_SPLIT 8
-
-#define ENCODER_ENABLE
-
-#ifdef ENCODER_ENABLE
-	#define ENCODERS_PAD_A { PIN_ROTARY_RA }
-	#define ENCODERS_PAD_B { PIN_ROTARY_RB }
-#endif
-
 /*
  * Feature disable options
  *  These options are also useful to firmware size reduction.

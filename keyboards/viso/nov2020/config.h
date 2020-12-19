@@ -13,13 +13,11 @@
 #define MATRIX_COL_PINS { PIN16, PIN17, PIN18, PIN19 }
 
 #define ENCODER_ENABLE
-
-#ifdef ENCODER_ENABLE
-	#define ENCODERS_PAD_A { PIN20 }
-	#define ENCODERS_PAD_B { PIN21 }
-#endif
-
-#define TAP_CODE_DELAY 50
+// #define ENCODER_V2
+#define ENCODERS_PAD_A { PIN20 }
+#define ENCODERS_PAD_B { PIN21 }
+#define ENCODERS_L {3, 3}
+#define ENCODERS_R {5, 3}
 
 #define RGB_DI_PIN PIN27
 #define RGBLIGHT_ANIMATIONS
