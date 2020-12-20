@@ -22,6 +22,10 @@ extern rgblight_config_t rgblight_config;
     #endif
 #endif
 
+#if defined(DISABLE_PIN_COUNT) && defined(DISABLE_PINS)
+static const uint8_t disable_pins[DISABLE_PIN_COUNT] = DISABLE_PINS;
+#endif
+
 #ifndef SLEEP_DELAY
 #define SLEEP_DELAY          600
 #endif
@@ -53,6 +57,12 @@ static bool __deviceIndicatorState = false;
 #endif
 
 void ubmk_init() {
+    #if defined(DISABLE_PIN_COUNT) && defined(DISABLE_PINS)
+    for(int i = 0; i < DISABLE_PIN_COUNT; i++) {
+        ubmk_pinMode(disable_pins[i], DISABLE);
+    }
+    #endif
+
     #ifdef LED_PIN0
     ubmk_pinMode(LED_PIN0, OUTPUT);
     #endif
