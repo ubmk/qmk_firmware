@@ -16,6 +16,4 @@
 
 #define TX_POWER 4
 
-#define ENCODER_ENABLE
-
 #endif // CONFIG_KEYMAP_H

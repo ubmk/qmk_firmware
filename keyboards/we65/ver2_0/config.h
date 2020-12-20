@@ -18,6 +18,7 @@
 #define RGBLED_NUM 16
 #define RGBLIGHT_SPLIT 8
 
+#define ENCODER_ENABLE
 #define ENCODERS_PAD_A { PIN24 }
 #define ENCODERS_PAD_B { PIN25 }
 #define ENCODERS_L {1, 7}
