@@ -6,6 +6,6 @@
 
 #define BLE_BANDWIDTH 1
 
-#define HID_BLE_SPEED 2
+#define HID_BLE_SPEED 3
 
-#define TX_POWER 4
+#define TX_POWER 8

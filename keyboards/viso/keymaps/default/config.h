@@ -1,10 +1,4 @@
-#ifndef CONFIG_KEYMAP_H
-#define CONFIG_KEYMAP_H
-
-#ifdef KEYBOARD_NAME
-#undef KEYBOARD_NAME
-#endif
-#define KEYBOARD_NAME ViS0
+#pragma once
 
 #define SLEEP_DELAY 600
 
@@ -15,5 +9,3 @@
 #define HID_BLE_SPEED 2
 
 #define TX_POWER 4
-
-#endif // CONFIG_KEYMAP_H

@@ -47,6 +47,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "ubmk.h"
 #endif
 
+#ifdef ENCODER_ENABLE
+#include "matrix_encoder.h"
+matrix_row_t read_cols_with_rotary(uint8_t r);
+#endif
+
 #include <stdbool.h>
 const uint32_t row_pins[THIS_DEVICE_ROWS] = MATRIX_ROW_PINS;
 const uint32_t col_pins[THIS_DEVICE_COLS] = MATRIX_COL_PINS;
@@ -196,6 +201,10 @@ void matrix_init(void) {
     matrix_debouncing[i] = 0;
   }
 
+#ifdef ENCODER_ENABLE
+  encoder_init();
+#endif
+
 #if defined(NRF_SEPARATE_KEYBOARD_MASTER) && defined(USE_I2C)
   i2c_init();
 #endif
@@ -223,6 +232,11 @@ static inline void set_received_key(ble_switch_state_t key, bool from_slave) {
 
 __attribute__ ((weak))
 uint8_t matrix_scan_impl(matrix_row_t* _matrix){
+
+#ifdef ENCODER_ENABLE
+  encoder_read();
+#endif
+
   uint8_t matrix_offset = isLeftHand ? 0 : MATRIX_ROWS-THIS_DEVICE_ROWS;
   volatile int matrix_changed = 0;
   ble_switch_state_t ble_switch_send[THIS_DEVICE_ROWS*THIS_DEVICE_COLS];
@@ -582,6 +596,26 @@ matrix_row_t read_cols(void)
   return row;
 }
 
+#ifdef ENCODER_ENABLE
+matrix_row_t read_cols_with_rotary(uint8_t r) {
+  matrix_row_t row = 0;
+  for (int i=0; i<THIS_DEVICE_COLS; i++) {
+    bool rV = encoder_get_value(r, i);
+    if (rV) {
+      NRF_LOG_INFO("Encoder active value");
+      row |= ((rV ? 1 : 0) << i);
+    } else {
+      #ifdef UBMK
+      row |= ((ubmk_pinRead(col_pins[i]) ? 0 : 1) << i);
+      #else
+      row |= ((nrf_gpio_pin_read(col_pins[i]) ? 0 : 1) << i);
+      #endif
+    }
+  }
+  return row;
+}
+#endif
+
 __attribute__ ((weak))
 matrix_row_t read_row(uint8_t row)
 {
@@ -590,7 +624,11 @@ matrix_row_t read_row(uint8_t row)
 #else
   select_row(row);
   wait_us(0);
+  #ifdef ENCODER_ENABLE
+  matrix_row_t row_state = read_cols_with_rotary(row);
+  #else
   matrix_row_t row_state = read_cols();
+  #endif
   unselect_rows();
   return row_state;
 #endif

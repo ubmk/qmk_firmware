@@ -14,14 +14,6 @@ int RGB_current_mode = 0;
 extern rgblight_config_t rgblight_config;
 #endif
 
-#ifdef ENCODER_ENABLE
-    #ifdef ENCODER_V2
-    #include "ubmk_encoder_v2.h"
-    #else
-    #include "ubmk_encoder.h"
-    #endif
-#endif
-
 #if defined(DISABLE_PIN_COUNT) && defined(DISABLE_PINS)
 static const uint8_t disable_pins[DISABLE_PIN_COUNT] = DISABLE_PINS;
 #endif
@@ -30,30 +22,40 @@ static const uint8_t disable_pins[DISABLE_PIN_COUNT] = DISABLE_PINS;
 #define SLEEP_DELAY          600
 #endif
 
-#define BAT_INDICATOR_ON (defined(LED_PIN0) || defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3))
-#define DEVICE_INDICATOR_ON defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
+#ifdef DISABLE_INDICATOR
+    #define BAT_INDICATOR_ON false
+    #define DEVICE_INDICATOR_ON false
+#else
+    #define BAT_INDICATOR_ON (defined(LED_PIN0) || defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3))
+    #define DEVICE_INDICATOR_ON defined(LED_PIN1) || defined(LED_PIN2) || defined(LED_PIN3)
+#endif
+
 #define INDICATOR_TIMEOUT(startAt) (timer_elapsed32(startAt) > 6000)
 #define IS_SLEEP_NOW(lastActionAt) (SLEEP_DELAY > 0 && timer_elapsed32(lastActionAt) > SLEEP_DELAY * 1000)
 #define HAS_USD_CONNECTED (nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_CONNECTED || nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_READY)
+
 void ubmk_sleep_mode_validate(void);
 void ubmk_force_bootloader(void);
 void ubmk_indicator_start(void);
 
-static uint8_t __indicatorChecked = 0;
-static uint32_t __indicatorCheckedTimer = 0;
+volatile uint8_t __indicatorChecked = 0;
+volatile uint32_t __indicatorCheckedTimer = 0;
 
-static bool usbConnected = false;
+volatile bool usbConnected = false;
 
-static uint32_t __lastTimePressed = 0;
-static bool __sleeped = false;
+volatile uint32_t __lastTimePressed = 0;
+volatile bool __sleeped = false;
 
 #if BAT_INDICATOR_ON
-static uint32_t __batIndicator = 0;
-static bool __batIndicatorState = false;
+volatile uint32_t __batIndicator = 0;
+volatile bool __batIndicatorState = false;
 #endif
 #if DEVICE_INDICATOR_ON
-static uint32_t __deviceIndicator = 0;
-static bool __deviceIndicatorState = false;
+volatile uint32_t __deviceIndicator = 0;
+volatile bool __deviceIndicatorState = false;
+#endif
+#ifdef PIN_CHARGE_STAT
+volatile bool __onChange = false;
 #endif
 
 void ubmk_init() {
@@ -75,10 +77,20 @@ void ubmk_init() {
     #ifdef LED_PIN3
     ubmk_pinMode(LED_PIN3, OUTPUT);
     #endif
+    #ifdef LED_CAP
+    ubmk_pinMode(LED_CAP, OUTPUT);
+    #endif
+    #ifdef LED_RED
+    ubmk_pinMode(LED_RED, OUTPUT);
+    ubmk_pinClear(LED_RED);
+    #endif
 
     #ifdef PIN_CHARGE_CTRL
     ubmk_pinMode(PIN_CHARGE_CTRL, OUTPUT);
     ubmk_pinClear(PIN_CHARGE_CTRL);
+    #endif
+    #ifdef PIN_CHARGE_STAT
+    ubmk_pinMode(PIN_CHARGE_STAT, INPUT_PULLDOWN);
     #endif
 
     #ifdef RGBLIGHT_ENABLE
@@ -90,10 +102,6 @@ void ubmk_init() {
             ubmk_pinSet(PIN_RGB_CTRL);
         }
         #endif
-    #endif
-
-    #ifdef ENCODER_ENABLE
-        encoder_init();
     #endif
 
     ubmk_force_bootloader();
@@ -169,18 +177,35 @@ void ubmk_scan(void) {
         }
     }
 #endif
+#ifdef PIN_CHARGE_STAT
+    if (HAS_USD_CONNECTED) {
+        if (ubmk_pinRead(PIN_CHARGE_STAT) == LOW) {
+            if (!__onChange) {
+                __onChange = true;
+                #ifdef LED_RED
+                ubmk_pinSet(LED_RED);
+                #endif
+            }
+        } else {
+            if (__onChange) {
+                __onChange = false;
+                #ifdef LED_RED
+                ubmk_pinClear(LED_RED);
+                #endif
+            }
+        }
+    } else {
+        if (__onChange) {
+            __onChange = false;
+            #ifdef LED_RED
+            ubmk_pinClear(LED_RED);
+            #endif
+        }
+    }
+#endif
 
     ubmk_force_bootloader();
     ubmk_sleep_mode_validate();
-
-#ifdef ENCODER_ENABLE
-    uint16_t currentRotaryState = get_current_rotaryState();
-    if (currentRotaryState != 0) {
-        unregister_code(currentRotaryState);
-        clear_rotaryState();
-    }
-    encoder_read();
-#endif
 
     /*
   #ifdef VDIV_PIN

@@ -58,7 +58,8 @@ ifeq ($(UBMK),yes)
   SRC += $(NRF_DIR)/ubmk.c
   SRC += $(NRF_DIR)/ubmk_kb.c
   ifeq ($(UBMK_ENCODER),yes)
-    SRC += $(NRF_DIR)/ubmk_encoder.c
+    #SRC += $(NRF_DIR)/ubmk_encoder.c
+    SRC += $(NRF_DIR)/matrix_encoder.c
   endif
 endif
 

@@ -47,6 +47,7 @@
 #include "usb_descriptor.h"
 #include "cli.h"
 #include "app_ble_func.h"
+#include "nrf_log.h"
 
 #ifdef RGBLIGHT_ENABLE
 #include "rgblight.h"
@@ -820,7 +821,7 @@ int usbd_send_system(uint16_t data) {
   report.usage = data;
   uint32_t ret = app_usbd_hid_generic_in_report_set(&m_app_hid_extra, &report,
       sizeof(report_extra_t));
-  NRF_LOG_INFO("Send system:%d", data);
+  NRF_LOG_INFO("Send system: %d", data);
   return ret;
 }
 
@@ -830,5 +831,6 @@ int usbd_send_consumer(uint16_t data) {
   report.usage = data;
   uint32_t ret = app_usbd_hid_generic_in_report_set(&m_app_hid_extra, &report,
       sizeof(report_extra_t));
+  NRF_LOG_INFO("Send consumer: %d", data);
   return ret;
 }

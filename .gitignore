@@ -6,6 +6,7 @@
 *.elf
 *.hex
 *.qmk
+*.uf2
 !util/bootloader.hex
 !quantum/tools/eeprom_reset.hex
 *.log

@@ -5,8 +5,8 @@
 /* in python2: list(u"whatever".encode('utf-16-le')) */
 /*   at most 32 characters or the ugly hack in usb_main.c borks */
 #define MANUFACTURER uybv
-#define PRODUCT We65
-#define DESCRIPTION We65 Keyboard
+#define PRODUCT We65i
+#define DESCRIPTION We65i Keyboard
 
 /* key matrix size */
 #define MATRIX_ROWS 9

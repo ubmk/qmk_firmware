@@ -2,7 +2,7 @@
 
 #include "custom_board.h"
 
-#define PRODUCT_ID      0x0024
+#define PRODUCT_ID      0x0026
 #define DEVICE_VER      0x0002
 
 #define MATRIX_ROW_PINS { PIN7, PIN8, PIN9, PIN10, PIN11, PIN12, PIN13, PIN14, PIN15 }
