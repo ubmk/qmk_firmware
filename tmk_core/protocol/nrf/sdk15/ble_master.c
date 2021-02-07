@@ -161,27 +161,27 @@
     #define MATRIX_SCAN_MS 12
     #define BLE_HID_MIN_INTERVAL 24
     #define BLE_HID_MAX_INTERVAL 94
-    #define BLE_HID_SLAVE_LATENCY 3
+    #define BLE_HID_SLAVE_LATENCY 4
   #elif (HID_BLE_SPEED == 2)
     #define MATRIX_SCAN_MS 12
     #define BLE_HID_MIN_INTERVAL 24
     #define BLE_HID_MAX_INTERVAL 78
-    #define BLE_HID_SLAVE_LATENCY 3
+    #define BLE_HID_SLAVE_LATENCY 5
   #elif (HID_BLE_SPEED == 3)
     #define MATRIX_SCAN_MS 12
     #define BLE_HID_MIN_INTERVAL 24
     #define BLE_HID_MAX_INTERVAL 62
-    #define BLE_HID_SLAVE_LATENCY 3
+    #define BLE_HID_SLAVE_LATENCY 5
   #elif (HID_BLE_SPEED == 4)
     #define MATRIX_SCAN_MS 12
     #define BLE_HID_MIN_INTERVAL 18
     #define BLE_HID_MAX_INTERVAL 46
-    #define BLE_HID_SLAVE_LATENCY 3
+    #define BLE_HID_SLAVE_LATENCY 5
   #else
     #define MATRIX_SCAN_MS 12
     #define BLE_HID_MIN_INTERVAL 24
     #define BLE_HID_MAX_INTERVAL 78
-    #define BLE_HID_SLAVE_LATENCY 3
+    #define BLE_HID_SLAVE_LATENCY 5
   #endif
 
 #else
