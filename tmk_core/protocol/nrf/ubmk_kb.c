@@ -90,16 +90,20 @@ void ubmk_init() {
     ubmk_pinClear(PIN_CHARGE_CTRL);
     #endif
     #ifdef PIN_CHARGE_STAT
+    #ifdef PIN_CHARGE_REV
     ubmk_pinMode(PIN_CHARGE_STAT, INPUT_PULLDOWN);
+    #else
+    ubmk_pinMode(PIN_CHARGE_STAT, INPUT_PULLUP);
+    #endif
     #endif
 
     #ifdef RGBLIGHT_ENABLE
-        #ifdef PIN_RGB_CTRL
-        ubmk_pinMode(PIN_RGB_CTRL, OUTPUT);
+        #ifdef PIN_RGB_CTRL_VCC
+        ubmk_pinMode(PIN_RGB_CTRL_VCC, OUTPUT);
         if (rgblight_config.enable) {
-            ubmk_pinClear(PIN_RGB_CTRL);
+            ubmk_pinClear(PIN_RGB_CTRL_VCC);
         } else {
-            ubmk_pinSet(PIN_RGB_CTRL);
+            ubmk_pinSet(PIN_RGB_CTRL_VCC);
         }
         #endif
     #endif
@@ -372,8 +376,8 @@ bool ubmk_process_record(uint16_t keycode, keyrecord_t *record) {
             case RGB_TOG:
                 #ifdef RGBLIGHT_ENABLE
                 if (RGB_current_mode == 0) {
-                    #ifdef PIN_RGB_CTRL
-                    ubmk_pinClear(PIN_RGB_CTRL);
+                    #ifdef PIN_RGB_CTRL_VCC
+                    ubmk_pinClear(PIN_RGB_CTRL_VCC);
                     #endif
                     eeconfig_update_rgblight_default();
                     RGB_current_mode = rgblight_config.mode;
@@ -381,13 +385,13 @@ bool ubmk_process_record(uint16_t keycode, keyrecord_t *record) {
                 } else {
                     if (rgblight_config.enable) {
                         rgblight_disable();
-                        #ifdef PIN_RGB_CTRL
-                        ubmk_pinSet(PIN_RGB_CTRL);
+                        #ifdef PIN_RGB_CTRL_VCC
+                        ubmk_pinSet(PIN_RGB_CTRL_VCC);
                         #endif
                     } else {
                         rgblight_enable();
-                        #ifdef PIN_RGB_CTRL
-                        ubmk_pinClear(PIN_RGB_CTRL);
+                        #ifdef PIN_RGB_CTRL_VCC
+                        ubmk_pinClear(PIN_RGB_CTRL_VCC);
                         #endif
                     }
                 }
@@ -396,8 +400,8 @@ bool ubmk_process_record(uint16_t keycode, keyrecord_t *record) {
                 break;
             case RGBRST:
                 #ifdef RGBLIGHT_ENABLE
-                    #ifdef PIN_RGB_CTRL
-                    ubmk_pinClear(PIN_RGB_CTRL);
+                    #ifdef PIN_RGB_CTRL_VCC
+                    ubmk_pinClear(PIN_RGB_CTRL_VCC);
                     #endif
                 eeconfig_update_rgblight_default();
                 rgblight_enable();

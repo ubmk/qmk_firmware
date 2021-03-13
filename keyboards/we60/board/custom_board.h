@@ -44,7 +44,7 @@ extern "C" {
     #define VDIV_PIN PIN2
     #define USE_BATTERY_PIN VDIV_PIN
     #define PIN_RGB PIN27
-    #define PIN_RGB_CTRL PIN26
+    #define PIN_RGB_CTRL_VCC PIN26
     #define PIN_CHARGE_CTRL PIN28
 
 #else

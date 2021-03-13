@@ -60,6 +60,30 @@
     #define NRF_SDH_CLOCK_LF_ACCURACY 7
     #endif
 
+#elif defined(WE65I_V2_2)
+
+    #define NRF_SDH_CLOCK_LF_SRC 1
+    #define NRF_SDH_CLOCK_LF_RC_CTIV 0
+    #define NRF_SDH_CLOCK_LF_RC_TEMP_CTIV 0
+
+    #ifndef UBMK_PRO
+    #define NRF_SDH_CLOCK_LF_ACCURACY 8
+    #else
+    #define NRF_SDH_CLOCK_LF_ACCURACY 7
+    #endif
+
+#elif defined(WE65I_V3_0)
+
+    #define NRF_SDH_CLOCK_LF_SRC 1
+    #define NRF_SDH_CLOCK_LF_RC_CTIV 0
+    #define NRF_SDH_CLOCK_LF_RC_TEMP_CTIV 0
+
+    #ifndef UBMK_PRO
+    #define NRF_SDH_CLOCK_LF_ACCURACY 8
+    #else
+    #define NRF_SDH_CLOCK_LF_ACCURACY 7
+    #endif
+
 #else
 #error "NO BOARD!"
 #endif
