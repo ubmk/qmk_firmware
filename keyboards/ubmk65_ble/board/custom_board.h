@@ -125,11 +125,12 @@ extern "C" {
     #define LED_PIN1 PIN4
     #define LED_PIN2 PIN5
     #define LED_PIN3 PIN6
-    #define LED_CAP  PIN28
+    #define LED_CAP  PIN29
 
     #define VDIV_PIN PIN2
     #define USE_BATTERY_PIN VDIV_PIN
-    #define PIN_RGB_DATA PIN30
+    #define PIN_RGB_DATA PIN27
+    #define PIN_RGB_CTRL_VCC PIN28
 
 #else
 #error "NO BOARD!"
