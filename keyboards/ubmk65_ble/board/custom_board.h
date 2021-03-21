@@ -46,6 +46,7 @@ extern "C" {
     #define VDIV_PIN PIN2
     #define VDIV_PIN_OTHER PIN29
     #define USE_BATTERY_PIN VDIV_PIN
+    #define PIN_RGB_DATA PIN27
 
 #elif defined(UBMK65_V1_1)
 
@@ -86,6 +87,7 @@ extern "C" {
     #define VDIV_PIN PIN2
     #define VDIV_PIN_OTHER PIN29
     #define USE_BATTERY_PIN VDIV_PIN
+    #define PIN_RGB_DATA PIN28
 
 #elif defined(UBMK65_V1_1F)
 
@@ -123,10 +125,11 @@ extern "C" {
     #define LED_PIN1 PIN4
     #define LED_PIN2 PIN5
     #define LED_PIN3 PIN6
-    #define LED_CAP  PIN30
+    #define LED_CAP  PIN28
 
     #define VDIV_PIN PIN2
     #define USE_BATTERY_PIN VDIV_PIN
+    #define PIN_RGB_DATA PIN30
 
 #else
 #error "NO BOARD!"

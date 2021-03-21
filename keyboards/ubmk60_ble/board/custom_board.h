@@ -48,6 +48,8 @@ extern "C" {
     #define USE_BATTERY_PIN VDIV_PIN
 */
 
+    #define PIN_RGB_DATA PIN27
+
 #else
 #error "NO BOARD!"
 #endif

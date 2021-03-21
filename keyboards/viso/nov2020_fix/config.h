@@ -17,7 +17,7 @@
 #define ENCODERS_L { {3, 3} }
 #define ENCODERS_R { {5, 3} }
 
-#define RGB_DI_PIN PIN27
-#define RGBLIGHT_ANIMATIONS
-#define RGBLED_NUM 6
-#define RGBLIGHT_SPLIT 3
+#ifdef RGBLIGHT_ENABLE
+    #define RGB_DI_PIN PIN_RGB_DATA
+    #define RGBLIGHT_ANIMATIONS
+#endif
