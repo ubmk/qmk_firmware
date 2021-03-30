@@ -53,7 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wait.h"
 
 #ifndef MATRIX_SCAN_MS
-#define MATRIX_SCAN_MS 17
+#define MATRIX_SCAN_MS 12
 #endif
 
 const uint8_t MAINTASK_INTERVAL=MATRIX_SCAN_MS;

@@ -118,7 +118,7 @@
 #endif
 
 #ifndef TX_POWER
-#define TX_POWER 0
+#define TX_POWER 8
 #endif
 
 #ifdef BLE_BANDWIDTH
@@ -171,12 +171,12 @@
     #define MATRIX_SCAN_MS 12
     #define BLE_HID_MIN_INTERVAL 24
     #define BLE_HID_MAX_INTERVAL 62
-    #define BLE_HID_SLAVE_LATENCY 5
+    #define BLE_HID_SLAVE_LATENCY 6
   #elif (HID_BLE_SPEED == 4)
     #define MATRIX_SCAN_MS 12
     #define BLE_HID_MIN_INTERVAL 18
     #define BLE_HID_MAX_INTERVAL 46
-    #define BLE_HID_SLAVE_LATENCY 5
+    #define BLE_HID_SLAVE_LATENCY 7
   #else
     #define MATRIX_SCAN_MS 12
     #define BLE_HID_MIN_INTERVAL 24

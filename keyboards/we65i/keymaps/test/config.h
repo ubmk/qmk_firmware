@@ -12,9 +12,9 @@
 
 #ifdef RGBLIGHT_ENABLE
     #ifndef RGBLED_NUM
-        #define RGBLED_NUM 30
+        #define RGBLED_NUM 16
     #endif
     #ifndef RGBLIGHT_SPLIT
-        #define RGBLIGHT_SPLIT 30
+        #define RGBLIGHT_SPLIT 16
     #endif
 #endif
