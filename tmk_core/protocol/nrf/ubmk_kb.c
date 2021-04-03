@@ -33,6 +33,7 @@ static const uint8_t disable_pins[DISABLE_PIN_COUNT] = DISABLE_PINS;
 #define INDICATOR_TIMEOUT(startAt) (timer_elapsed32(startAt) > 6000)
 #define IS_SLEEP_NOW(lastActionAt) (SLEEP_DELAY > 0 && timer_elapsed32(lastActionAt) > SLEEP_DELAY * 1000)
 #define HAS_USD_CONNECTED (nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_CONNECTED || nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_READY)
+#define HAS_CHARGE_STAT defined(PIN_CHARGE_STAT_LOW) || defined(PIN_CHARGE_STAT_HIGH)
 
 void ubmk_sleep_mode_validate(void);
 void ubmk_force_bootloader(void);
@@ -54,7 +55,7 @@ volatile bool __batIndicatorState = false;
 volatile uint32_t __deviceIndicator = 0;
 volatile bool __deviceIndicatorState = false;
 #endif
-#ifdef PIN_CHARGE_STAT
+#if HAS_CHARGE_STAT
 volatile bool __onChange = false;
 #endif
 
@@ -89,11 +90,11 @@ void ubmk_init() {
     ubmk_pinMode(PIN_CHARGE_CTRL, OUTPUT);
     ubmk_pinClear(PIN_CHARGE_CTRL);
     #endif
-    #ifdef PIN_CHARGE_STAT
-    #ifdef PIN_CHARGE_REV
-    ubmk_pinMode(PIN_CHARGE_STAT, INPUT_PULLDOWN);
+    #ifdef HAS_CHARGE_STAT
+    #ifdef PIN_CHARGE_STAT_HIGH
+    ubmk_pinMode(PIN_CHARGE_STAT_HIGH, INPUT_PULLDOWN);
     #else
-    ubmk_pinMode(PIN_CHARGE_STAT, INPUT_PULLUP);
+    ubmk_pinMode(PIN_CHARGE_STAT_LOW, INPUT_PULLUP);
     #endif
     #endif
 
@@ -104,6 +105,14 @@ void ubmk_init() {
             ubmk_pinClear(PIN_RGB_CTRL_VCC);
         } else {
             ubmk_pinSet(PIN_RGB_CTRL_VCC);
+        }
+        #endif
+        #ifdef PIN_RGB_CTRL_GND
+        ubmk_pinMode(PIN_RGB_CTRL_GND, OUTPUT);
+        if (rgblight_config.enable) {
+            ubmk_pinSet(PIN_RGB_CTRL_GND);
+        } else {
+            ubmk_pinClear(PIN_RGB_CTRL_GND);
         }
         #endif
     #endif
@@ -181,9 +190,13 @@ void ubmk_scan(void) {
         }
     }
 #endif
-#ifdef PIN_CHARGE_STAT
+#ifdef HAS_CHARGE_STAT
     if (HAS_USD_CONNECTED) {
-        if (ubmk_pinRead(PIN_CHARGE_STAT) == LOW) {
+        #ifdef PIN_CHARGE_STAT_LOW
+        if (ubmk_pinRead(PIN_CHARGE_STAT_LOW) == LOW) {
+        #else
+        if (ubmk_pinRead(PIN_CHARGE_STAT_HIGH) == LOW) {
+        #endif
             if (!__onChange) {
                 __onChange = true;
                 #ifdef LED_RED
@@ -379,6 +392,9 @@ bool ubmk_process_record(uint16_t keycode, keyrecord_t *record) {
                     #ifdef PIN_RGB_CTRL_VCC
                     ubmk_pinClear(PIN_RGB_CTRL_VCC);
                     #endif
+                    #ifdef PIN_RGB_CTRL_GND
+                    ubmk_pinSet(PIN_RGB_CTRL_GND);
+                    #endif
                     eeconfig_update_rgblight_default();
                     RGB_current_mode = rgblight_config.mode;
                     rgblight_enable();
@@ -388,10 +404,16 @@ bool ubmk_process_record(uint16_t keycode, keyrecord_t *record) {
                         #ifdef PIN_RGB_CTRL_VCC
                         ubmk_pinSet(PIN_RGB_CTRL_VCC);
                         #endif
+                        #ifdef PIN_RGB_CTRL_GND
+                        ubmk_pinClear(PIN_RGB_CTRL_GND);
+                        #endif
                     } else {
                         rgblight_enable();
                         #ifdef PIN_RGB_CTRL_VCC
                         ubmk_pinClear(PIN_RGB_CTRL_VCC);
+                        #endif
+                        #ifdef PIN_RGB_CTRL_GND
+                        ubmk_pinSet(PIN_RGB_CTRL_GND);
                         #endif
                     }
                 }
@@ -402,6 +424,9 @@ bool ubmk_process_record(uint16_t keycode, keyrecord_t *record) {
                 #ifdef RGBLIGHT_ENABLE
                     #ifdef PIN_RGB_CTRL_VCC
                     ubmk_pinClear(PIN_RGB_CTRL_VCC);
+                    #endif
+                    #ifdef PIN_RGB_CTRL_GND
+                    ubmk_pinSet(PIN_RGB_CTRL_GND);
                     #endif
                 eeconfig_update_rgblight_default();
                 rgblight_enable();

@@ -36,7 +36,7 @@
 // <11=> NRF_CLOCK_LF_ACCURACY_1_PPM 
 // #define NRF_SDH_CLOCK_LF_ACCURACY 8
 
-#if defined(WE65I_V2_2)
+#if defined(WE65I_V3_0)
 
     #define NRF_SDH_CLOCK_LF_SRC 1
     #define NRF_SDH_CLOCK_LF_RC_CTIV 0
