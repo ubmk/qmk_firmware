@@ -33,7 +33,6 @@ static const uint8_t disable_pins[DISABLE_PIN_COUNT] = DISABLE_PINS;
 #define INDICATOR_TIMEOUT(startAt) (timer_elapsed32(startAt) > 6000)
 #define IS_SLEEP_NOW(lastActionAt) (SLEEP_DELAY > 0 && timer_elapsed32(lastActionAt) > SLEEP_DELAY * 1000)
 #define HAS_USD_CONNECTED (nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_CONNECTED || nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_READY)
-#define HAS_CHARGE_STAT defined(PIN_CHARGE_STAT_LOW) || defined(PIN_CHARGE_STAT_HIGH)
 
 void ubmk_sleep_mode_validate(void);
 void ubmk_force_bootloader(void);
@@ -55,7 +54,7 @@ volatile bool __batIndicatorState = false;
 volatile uint32_t __deviceIndicator = 0;
 volatile bool __deviceIndicatorState = false;
 #endif
-#if HAS_CHARGE_STAT
+#if defined(PIN_CHARGE_STAT_LOW) || defined(PIN_CHARGE_STAT_HIGH)
 volatile bool __onChange = false;
 #endif
 
@@ -90,12 +89,11 @@ void ubmk_init() {
     ubmk_pinMode(PIN_CHARGE_CTRL, OUTPUT);
     ubmk_pinClear(PIN_CHARGE_CTRL);
     #endif
-    #ifdef HAS_CHARGE_STAT
+    
     #ifdef PIN_CHARGE_STAT_HIGH
     ubmk_pinMode(PIN_CHARGE_STAT_HIGH, INPUT_PULLDOWN);
-    #else
+    #elif defined(PIN_CHARGE_STAT_LOW)
     ubmk_pinMode(PIN_CHARGE_STAT_LOW, INPUT_PULLUP);
-    #endif
     #endif
 
     #ifdef RGBLIGHT_ENABLE
@@ -190,11 +188,11 @@ void ubmk_scan(void) {
         }
     }
 #endif
-#ifdef HAS_CHARGE_STAT
+#if defined(PIN_CHARGE_STAT_LOW) || defined(PIN_CHARGE_STAT_HIGH)
     if (HAS_USD_CONNECTED) {
         #ifdef PIN_CHARGE_STAT_LOW
         if (ubmk_pinRead(PIN_CHARGE_STAT_LOW) == LOW) {
-        #else
+        #elif defined(PIN_CHARGE_STAT_HIGH)
         if (ubmk_pinRead(PIN_CHARGE_STAT_HIGH) == LOW) {
         #endif
             if (!__onChange) {
