@@ -71,7 +71,12 @@ void adc_start() {
 
 uint16_t get_vcc() {
 #if defined(UBMK) && defined(VDIV_PIN)
-  return ubmk_analogReadMv(VDIV_PIN);
+  #ifdef VBAT_HISTORY_RAW
+  return ubmk_analogRead(VDIV_PIN);
+  #else
+  uint32_t raw = ubmk_analogRead(VDIV_PIN);
+  return ubmk_valueToMv(raw);
+  #endif
 #else
   int16_t v = adc_buffer[0] < 0 ? 0 : adc_buffer[0];
   #ifdef USE_BATTERY_PIN

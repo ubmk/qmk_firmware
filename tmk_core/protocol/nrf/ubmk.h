@@ -26,9 +26,10 @@ void ubmk_pinClear(uint32_t ulPin);
 pin_state_t ubmk_pinRead(uint32_t ulPin);
 void ubmk_pinToggle(uint32_t pin);
 uint32_t ubmk_analogRead(uint32_t ulPin);
-float ubmk_analogReadMv(uint32_t ulPin);
 
 void ubmk_delay(uint32_t number_of_ms);
+uint32_t ubmk_valueToMv(uint32_t value);
 uint8_t ubmk_mvToPercent(float mvolts);
+uint8_t ubmk_valueToPercent(float value);
 
 #endif // UBMK_H_

@@ -54,6 +54,18 @@
     #define NRF_SDH_CLOCK_LF_ACCURACY 7
     #endif
 
+#elif defined(UBMK65_V1_1_FIX_COL0)
+
+    #define NRF_SDH_CLOCK_LF_SRC 1
+    #define NRF_SDH_CLOCK_LF_RC_CTIV 0
+    #define NRF_SDH_CLOCK_LF_RC_TEMP_CTIV 0
+
+    #ifndef UBMK_PRO
+    #define NRF_SDH_CLOCK_LF_ACCURACY 8
+    #else
+    #define NRF_SDH_CLOCK_LF_ACCURACY 7
+    #endif
+
 #elif defined(UBMK65_V1_1F)
 
     #define NRF_SDH_CLOCK_LF_SRC 1

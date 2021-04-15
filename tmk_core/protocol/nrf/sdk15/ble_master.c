@@ -500,7 +500,11 @@ uint8_t get_battery_level(void) {
   }
   int16_t vbat = sum / m_vbat_history_length;
 # if defined(UBMK) && defined(VDIV_PIN)
+  #ifdef VBAT_HISTORY_RAW
+  battery_level = ubmk_valueToPercent((float)vbat);
+  #else
   battery_level = ubmk_mvToPercent((float)vbat);
+  #endif
 # else
 
 #   ifndef BATTERY_VMAX

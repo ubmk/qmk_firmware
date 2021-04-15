@@ -150,6 +150,12 @@ uint32_t ubmk_analogRead(uint32_t ulPin) {
   uint32_t pin = SAADC_CH_PSELP_PSELP_NC;
   volatile int16_t value = 0;
 
+  float mv_per_lsb = 3000.0F/4096.0F; // 12-bit ADC with 3.6V input range
+  uint32_t saadcResolution= SAADC_RESOLUTION_VAL_12bit;
+  uint32_t saadcReference = SAADC_CH_CONFIG_REFSEL_Internal;
+  uint32_t saadcGain      = SAADC_CH_CONFIG_GAIN_Gain1_5;
+  bool saadcBurst         = SAADC_CH_CONFIG_BURST_Disabled;
+
   /*
   if (ulPin >= PINS_COUNT) {
     return 0;
@@ -195,7 +201,7 @@ uint32_t ubmk_analogRead(uint32_t ulPin) {
       return 0;
   }
 
-  NRF_SAADC->RESOLUTION = SAADC_RESOLUTION_VAL_12bit;
+  NRF_SAADC->RESOLUTION = saadcResolution;
 
   NRF_SAADC->ENABLE = (SAADC_ENABLE_ENABLE_Enabled << SAADC_ENABLE_ENABLE_Pos);
   for (int i = 0; i < 8; i++) {
@@ -204,11 +210,11 @@ uint32_t ubmk_analogRead(uint32_t ulPin) {
   }
   NRF_SAADC->CH[0].CONFIG = ((SAADC_CH_CONFIG_RESP_Bypass     << SAADC_CH_CONFIG_RESP_Pos)   & SAADC_CH_CONFIG_RESP_Msk)
                             | ((SAADC_CH_CONFIG_RESP_Bypass   << SAADC_CH_CONFIG_RESN_Pos)   & SAADC_CH_CONFIG_RESN_Msk)
-                            | ((SAADC_CH_CONFIG_GAIN_Gain1_5                     << SAADC_CH_CONFIG_GAIN_Pos)   & SAADC_CH_CONFIG_GAIN_Msk)
-                            | ((SAADC_CH_CONFIG_REFSEL_Internal                << SAADC_CH_CONFIG_REFSEL_Pos) & SAADC_CH_CONFIG_REFSEL_Msk)
+                            | ((saadcGain                     << SAADC_CH_CONFIG_GAIN_Pos)   & SAADC_CH_CONFIG_GAIN_Msk)
+                            | ((saadcReference                << SAADC_CH_CONFIG_REFSEL_Pos) & SAADC_CH_CONFIG_REFSEL_Msk)
                             | ((SAADC_CH_CONFIG_TACQ_3us      << SAADC_CH_CONFIG_TACQ_Pos)   & SAADC_CH_CONFIG_TACQ_Msk)
                             | ((SAADC_CH_CONFIG_MODE_SE       << SAADC_CH_CONFIG_MODE_Pos)   & SAADC_CH_CONFIG_MODE_Msk)
-                            | ((SAADC_CH_CONFIG_BURST_Disabled                    << SAADC_CH_CONFIG_BURST_Pos)   & SAADC_CH_CONFIG_BURST_Msk);
+                            | ((saadcBurst                    << SAADC_CH_CONFIG_BURST_Pos)   & SAADC_CH_CONFIG_BURST_Msk);
   NRF_SAADC->CH[0].PSELN = pin;
   NRF_SAADC->CH[0].PSELP = pin;
 
@@ -237,31 +243,54 @@ uint32_t ubmk_analogRead(uint32_t ulPin) {
 
   NRF_SAADC->ENABLE = (SAADC_ENABLE_ENABLE_Disabled << SAADC_ENABLE_ENABLE_Pos);
 
-  return value;
-}
-
-float ubmk_analogReadMv(uint32_t ulPin) {
-  float raw = ubmk_analogRead(ulPin);
-  return raw * 0.73242188F * 2.0F;
+  return value * mv_per_lsb;
 }
 
 void ubmk_delay(uint32_t number_of_ms) {
     nrf_delay_ms(number_of_ms);
 }
 
+#ifndef VBAT_DIVIDER_COMP
+#define VBAT_DIVIDER_COMP (2.01F) //  = 1 / (R2 / (R1 + R2))
+#endif
+
+uint32_t ubmk_valueToMv(uint32_t value) {
+  return value * VBAT_DIVIDER_COMP;
+}
+
 uint8_t ubmk_mvToPercent(float mvolts) {
   if(mvolts < 3300)
     return 0;
 
-  if(mvolts < 3600) {
+  if(mvolts < 3580) {
     mvolts -= 3300;
     return mvolts / 30;
   }
 
   mvolts -= 3600;
-  float result = 11 + (mvolts * 0.15F);  // thats mvolts /6.66666666
+  float result = 12 + (mvolts * 0.15F);  // thats mvolts /6.66666666
   if (result > 100.00F) {
     return 100.00F;
   }
   return result;
+}
+
+uint8_t ubmk_valueToPercent(float value) {
+  uint8_t battery_level;
+
+  if (value >= 3000) {
+    battery_level = 100;
+  } else if (value > 2900) {
+    battery_level = 100 - ((3000 - value) * 58) / 100;
+  } else if (value > 2740) {
+    battery_level = 42 - ((2900 - value) * 24) / 160;
+  } else if (value > 2440) {
+    battery_level = 18 - ((2740 - value) * 12) / 300;
+  } else if (value > 2100) {
+    battery_level = 6 - ((2440 - value) * 6) / 340;
+  } else {
+    battery_level = 0;
+  }
+
+  return battery_level;
 }

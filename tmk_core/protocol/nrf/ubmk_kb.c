@@ -35,7 +35,9 @@ static const uint8_t disable_pins[DISABLE_PIN_COUNT] = DISABLE_PINS;
 #define HAS_USD_CONNECTED (nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_CONNECTED || nrfx_power_usbstatus_get() == NRFX_POWER_USB_STATE_READY)
 
 void ubmk_sleep_mode_validate(void);
+#ifndef DISABLE_DFU_USE_ESC
 void ubmk_force_bootloader(void);
+#endif
 void ubmk_indicator_start(void);
 
 volatile uint8_t __indicatorChecked = 0;
@@ -114,8 +116,9 @@ void ubmk_init() {
         }
         #endif
     #endif
-
+    #ifndef DISABLE_DFU_USE_ESC
     ubmk_force_bootloader();
+    #endif
 }
 
 void ubmk_indicator_start(void) {
@@ -218,8 +221,9 @@ void ubmk_scan(void) {
         }
     }
 #endif
-
+    #ifndef DISABLE_DFU_USE_ESC
     ubmk_force_bootloader();
+    #endif
     ubmk_sleep_mode_validate();
 
     /*
@@ -239,6 +243,7 @@ void ubmk_scan(void) {
   */
 }
 
+#ifndef DISABLE_DFU_USE_ESC
 void ubmk_force_bootloader(void) {
     bool _usbConnected = HAS_USD_CONNECTED;
     if (_usbConnected != usbConnected) {
@@ -255,6 +260,7 @@ void ubmk_force_bootloader(void) {
         }
     }
 }
+#endif
 
 void ubmk_sleep_mode_validate(void) {
     if (HAS_USD_CONNECTED) {

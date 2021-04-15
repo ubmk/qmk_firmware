@@ -43,6 +43,7 @@ extern "C" {
 
     #define VDIV_PIN PIN2
     #define USE_BATTERY_PIN VDIV_PIN
+    #define VBAT_DIVIDER_COMP (1.415F) //  = 1 / (R2 / (R1 + R2))
     #define PIN_CHARGE_CTRL PIN28
     #define PIN_CHARGE_STAT_LOW PIN29
     #define PIN_RGB_DATA PIN27
