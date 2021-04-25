@@ -93,8 +93,8 @@ void encoder_clear_value(uint8_t row, uint8_t col) {
 
 void encoder_init(void) {
     for (int i = 0; i < NUMBER_OF_ENCODERS; i++) {
-        ubmk_pinMode(encoders_pad_a[i], INPUT_PULLUP);
-        ubmk_pinMode(encoders_pad_b[i], INPUT_PULLUP);
+        ubmk_pinMode(encoders_pad_a[i], INPUT);
+        ubmk_pinMode(encoders_pad_b[i], INPUT);
 
         uint32_t av = nrf_gpio_pin_read(encoders_pad_a[i]);
         uint32_t bv = nrf_gpio_pin_read(encoders_pad_b[i]);
