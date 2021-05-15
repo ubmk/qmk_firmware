@@ -279,7 +279,7 @@ EXTRAINCDIRS += \
   $(NRFSDK_ROOT)/components/softdevice/s140/headers \
   $(NRFSDK_ROOT)/components/softdevice/s140/headers/nrf52 \
 
-NRFLIB := libnrf.sdk15.$(MCU_SERIES)
+NRFLIB := libnrf.sdk15.$(MCU_SERIES).$(BOARD_VER)
 
 ifeq ($(strip $(NRF_SEPARATE)), master)
   NRFSRC += \
@@ -561,9 +561,8 @@ nrfutil: $(TARGET).zip
 		$(NRFUTIL) dfu usb_serial -pkg $(TARGET).zip -p $$USB; \
 	fi
 
-uf2: $(BUILD_DIR)/$(TARGET).bin
-	./util/uf2conv.py -f nrf52 -b 0x26000 -o $(TARGET).uf2 $(BUILD_DIR)/$(TARGET).bin -c
-	-./util/uf2conv.py -f nrf52 -b 0x26000 $(BUILD_DIR)/$(TARGET).bin
+uf2: $(BUILD_DIR)/$(TARGET).hex
+	./util/uf2conv.py $(BUILD_DIR)/$(TARGET).hex -c -f 0xADA52840 -o $(TARGET).uf2
 
 elf: $(NRFLIB)
 
