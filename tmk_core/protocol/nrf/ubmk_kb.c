@@ -480,6 +480,15 @@ void before_sleep_mode_enter(void) {
     #ifdef LED_PIN3
     ubmk_pinClear(LED_PIN3);
     #endif
+    #ifdef RGBLIGHT_ENABLE
+    rgblight_disable();
+    #ifdef PIN_RGB_CTRL_VCC
+    ubmk_pinSet(PIN_RGB_CTRL_VCC);
+    #endif
+    #ifdef PIN_RGB_CTRL_GND
+    ubmk_pinClear(PIN_RGB_CTRL_GND);
+    #endif
+    #endif
 }
 
 void ubmk_device_indicator(bool state) {
